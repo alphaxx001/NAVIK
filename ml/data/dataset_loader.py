@@ -10,7 +10,8 @@ class IOVNBDProductionDataset(Dataset):
     Production PyTorch Dataset for IO-VNBD.
     Reads manifesting and normalization from 'data/manifests/'.
     """
-    def __init__(self, config_path="configs/data_pipeline.json", split="train"):
+    def __init__(self, config_path="configs/data_pipeline.json", split="train", stride_override=None, target_type='velocity'):
+        self.target_type = target_type
         with open(config_path, 'r') as f:
             self.config = json.load(f)
             
@@ -25,13 +26,22 @@ class IOVNBDProductionDataset(Dataset):
         self.inventory = self.inventory[self.inventory['session_id'].isin(self.sessions)]
         
         self.window_size = self.config['windowing']['sample_count']
-        self.stride = self.config['windowing']['stride']
+        self.stride = stride_override if stride_override is not None else self.config['windowing']['stride']
         
         self.features_mean = np.array(self.norm['features']['mean'])
         self.features_std = np.array(self.norm['features']['std'])
-        self.target_mean = self.norm['targets']['mean']
-        self.target_std = self.norm['targets']['std']
         
+        if self.target_type == 'velocity':
+            self.target_mean = self.norm['targets']['mean']
+            self.target_std = self.norm['targets']['std']
+        elif self.target_type == 'yaw_rate':
+            # Yaw rate is naturally zero-centered. We can use std=0.2 (approx 11 deg/s) or just 1.0.
+            self.target_mean = 0.0
+            self.target_std = 0.2
+        else:
+            self.target_mean = 0.0
+            self.target_std = 1.0
+            
         self.windows = []
         self._load_data()
         
@@ -49,22 +59,20 @@ class IOVNBDProductionDataset(Dataset):
             s_df.columns = [c.strip() for c in s_df.columns]
             v_df.columns = [c.strip() for c in v_df.columns]
             
-            # Find velocity column
-            vel_cols = [c for c in v_df.columns if "velocity" in c.lower() or "speed" in c.lower()]
-            vel_col = None
-            for c in vel_cols:
-                if "km/hr" in c.lower() and "velocity" in c.lower():
-                    vel_col = c
-                    break
-            if not vel_col and vel_cols: vel_col = vel_cols[0]
+            # Find target column
+            if self.target_type == 'velocity':
+                cols = [c for c in v_df.columns if "velocity" in c.lower() or "speed" in c.lower()]
+                target_vals = (v_df[cols[0]] / 3.6).interpolate(method='linear').bfill().ffill().values
+            else:
+                cols = [c for c in v_df.columns if "yaw" in c.lower()]
+                target_vals = np.radians(v_df[cols[0]]).interpolate(method='linear').bfill().ffill().values
             
             # Get data arrays
             X_raw = s_df[self.config['processing']['features']].interpolate(method='linear').bfill().ffill().values
-            Y_raw = (v_df[vel_col] / 3.6).interpolate(method='linear').bfill().ffill().values
             
             # Normalize
             X_norm = (X_raw - self.features_mean) / self.features_std
-            Y_norm = (Y_raw - self.target_mean) / self.target_std
+            Y_norm = (target_vals - self.target_mean) / self.target_std
             
             # Generate overlapping windows
             for i in range(0, len(X_norm) - self.window_size + 1, self.stride):

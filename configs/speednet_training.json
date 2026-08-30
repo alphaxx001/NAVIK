@@ -1,0 +1,24 @@
+{
+    "model": {
+        "in_channels": 6,
+        "cnn_channels": 32,
+        "kernel_size": 3,
+        "gru_hidden": 64,
+        "gru_layers": 1
+    },
+    "training": {
+        "batch_size": 1024,
+        "learning_rate": 0.001,
+        "epochs": 15,
+        "patience": 3,
+        "seed": 42,
+        "optimizer": "Adam",
+        "stride_override_train": 5,
+        "stride_override_val": 5
+    },
+    "paths": {
+        "checkpoint_dir": "ml/models/speednet/checkpoints",
+        "best_model": "ml/models/speednet/checkpoints/speednet_best.pth",
+        "data_config": "configs/data_pipeline.json"
+    }
+}
