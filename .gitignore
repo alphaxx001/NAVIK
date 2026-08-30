@@ -5,6 +5,13 @@ data/processed/
 # Do NOT ignore manifests
 !data/manifests/
 
+# Explicitly track OSM gitkeep
+!data/raw/OSM/
+!data/raw/OSM/.gitkeep
+data/raw/OSM/*.osm
+data/raw/OSM/*.pbf
+data/raw/OSM/*.xml
+
 # Ignore python caches
 __pycache__/
 *.pyc
