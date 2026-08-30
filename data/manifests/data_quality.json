@@ -1,0 +1,1196 @@
+{
+    "anomalies": [
+        {
+            "session": "Vfa01",
+            "issue": "Row count mismatch",
+            "s_rows": 11486,
+            "v_rows": 11535
+        },
+        {
+            "session": "Vfa02",
+            "issue": "Row count mismatch",
+            "s_rows": 67523,
+            "v_rows": 67755
+        },
+        {
+            "session": "Vta1b",
+            "issue": "Row count mismatch",
+            "s_rows": 954,
+            "v_rows": 953
+        },
+        {
+            "session": "Vtb10",
+            "issue": "Row count mismatch",
+            "s_rows": 196,
+            "v_rows": 195
+        },
+        {
+            "session": "Vw1",
+            "issue": "Row count mismatch",
+            "s_rows": 20476,
+            "v_rows": 20475
+        },
+        {
+            "session": "Vw15",
+            "issue": "Row count mismatch",
+            "s_rows": 1380,
+            "v_rows": 1391
+        },
+        {
+            "session": "Vw2",
+            "issue": "Row count mismatch",
+            "s_rows": 52713,
+            "v_rows": 52712
+        },
+        {
+            "session": "Vw4",
+            "issue": "Row count mismatch",
+            "s_rows": 126526,
+            "v_rows": 126527
+        },
+        {
+            "session": "Vw9",
+            "issue": "Row count mismatch",
+            "s_rows": 552,
+            "v_rows": 553
+        }
+    ],
+    "sampling_rates": [
+        9.998806430931271,
+        10.000001932554243,
+        10.0,
+        10.0,
+        10.0,
+        10.000002689474124,
+        10.000001057116089,
+        10.0,
+        10.0,
+        10.0,
+        9.999751867199326,
+        10.0,
+        10.0,
+        10.0,
+        9.973818175396149,
+        9.999656369196936,
+        10.000003894840855,
+        10.000018198395265,
+        10.0,
+        10.0,
+        9.999936020882783,
+        10.0,
+        9.999914530645038,
+        10.000310087134485,
+        10.0,
+        10.0,
+        10.0,
+        10.000936796611327,
+        10.0,
+        10.0,
+        10.000055928724434,
+        10.0,
+        10.0,
+        10.0,
+        10.0,
+        10.001290489095368,
+        8.31906103859173,
+        10.0,
+        9.999775789780498,
+        10.0,
+        10.0,
+        10.0,
+        9.999998446891695,
+        10.0,
+        9.999782613421447,
+        10.0,
+        10.000221734406528,
+        10.0,
+        10.0,
+        10.0,
+        10.0,
+        10.0,
+        9.999994894575538,
+        10.0,
+        10.00001701261826,
+        9.999911111901227,
+        9.999695131245998,
+        9.999974093331364,
+        9.99990108901,
+        10.0,
+        10.000062461352037,
+        10.0,
+        10.00014940249673
+    ],
+    "sessions": {
+        "M": {
+            "dt_mean": 100.01193711546446,
+            "dt_std": 3.968366473559646,
+            "hz": 9.998806430931271,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "S1": {
+            "dt_mean": 99.9999806744613,
+            "dt_std": 0.7646277014987142,
+            "hz": 10.000001932554243,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "S2": {
+            "dt_mean": 100.0,
+            "dt_std": 0.5868541640222023,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "S3a": {
+            "dt_mean": 100.0,
+            "dt_std": 0.7830453578777589,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "S3b": {
+            "dt_mean": 100.0,
+            "dt_std": 0.7916017857280369,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "S3c": {
+            "dt_mean": 99.999973105266,
+            "dt_std": 0.8548116913237225,
+            "hz": 10.000002689474124,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "S4": {
+            "dt_mean": 99.99998942884024,
+            "dt_std": 0.8611980014061938,
+            "hz": 10.000001057116089,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta10": {
+            "dt_mean": 100.0,
+            "dt_std": 0.6867936684123933,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta11": {
+            "dt_mean": 100.0,
+            "dt_std": 0.5779171326243465,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta12": {
+            "dt_mean": 100.0,
+            "dt_std": 0.6225114661205526,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta13": {
+            "dt_mean": 100.00248138957816,
+            "dt_std": 0.6437281275966673,
+            "hz": 9.999751867199326,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta14": {
+            "dt_mean": 100.0,
+            "dt_std": 0.6363906545410923,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta15": {
+            "dt_mean": 100.0,
+            "dt_std": 0.8406728074767075,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta16": {
+            "dt_mean": 100.0,
+            "dt_std": 0.6473739217250982,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta17": {
+            "dt_mean": 100.26250553342187,
+            "dt_std": 17.62333172974422,
+            "hz": 9.973818175396149,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta19": {
+            "dt_mean": 100.00343642611683,
+            "dt_std": 0.7058824108285489,
+            "hz": 9.999656369196936,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta1a": {
+            "dt_mean": 99.99996105160662,
+            "dt_std": 0.7051624896077635,
+            "hz": 10.000003894840855,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta2": {
+            "dt_mean": 99.99981801637853,
+            "dt_std": 0.6983667177296338,
+            "hz": 10.000018198395265,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta20": {
+            "dt_mean": 100.0,
+            "dt_std": 0.6178595840070366,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta21": {
+            "dt_mean": 100.0,
+            "dt_std": 0.576237839891824,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta22": {
+            "dt_mean": 100.00063979526551,
+            "dt_std": 0.590498103610598,
+            "hz": 9.999936020882783,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta23": {
+            "dt_mean": 100.0,
+            "dt_std": 0.6454390164031001,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta24": {
+            "dt_mean": 100.0008547008547,
+            "dt_std": 0.6685864315815839,
+            "hz": 9.999914530645038,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta25": {
+            "dt_mean": 99.9968992248062,
+            "dt_std": 0.5623783912639597,
+            "hz": 10.000310087134485,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta26": {
+            "dt_mean": 100.0,
+            "dt_std": 0.5815146218532793,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta27": {
+            "dt_mean": 100.0,
+            "dt_std": 0.5332578389524655,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta28": {
+            "dt_mean": 100.0,
+            "dt_std": 0.5820634108133325,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta29": {
+            "dt_mean": 99.99063291139241,
+            "dt_std": 1.1217812934388078,
+            "hz": 10.000936796611327,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta3": {
+            "dt_mean": 100.0,
+            "dt_std": 0.5897678246195885,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta30": {
+            "dt_mean": 100.0,
+            "dt_std": 0.7316274115901735,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta4": {
+            "dt_mean": 99.99944071588367,
+            "dt_std": 0.5651114205414124,
+            "hz": 10.000055928724434,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta5": {
+            "dt_mean": 100.0,
+            "dt_std": 0.4917622040778217,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta6": {
+            "dt_mean": 100.0,
+            "dt_std": 0.5981790549811835,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta7": {
+            "dt_mean": 100.0,
+            "dt_std": 0.660479834243403,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta8": {
+            "dt_mean": 100.0,
+            "dt_std": 0.6606531503247476,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vta9": {
+            "dt_mean": 99.98709677419355,
+            "dt_std": 0.6323238938738498,
+            "hz": 10.001290489095368,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vtb1": {
+            "dt_mean": 120.2058736389897,
+            "dt_std": 4024.250336301481,
+            "hz": 8.31906103859173,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vtb11": {
+            "dt_mean": 100.0,
+            "dt_std": 0.8498365855987975,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vtb12": {
+            "dt_mean": 100.00224215246637,
+            "dt_std": 0.7071032263766851,
+            "hz": 9.999775789780498,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vtb2": {
+            "dt_mean": 100.0,
+            "dt_std": 0.6498791019390482,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vtb3": {
+            "dt_mean": 100.0,
+            "dt_std": 0.6602842113162767,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vtb4": {
+            "dt_mean": 100.0,
+            "dt_std": 0.5631315273691547,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vtb5": {
+            "dt_mean": 100.00001553108547,
+            "dt_std": 0.8643267564029528,
+            "hz": 9.999998446891695,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vtb6": {
+            "dt_mean": 100.0,
+            "dt_std": 1.1662593904422671,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vtb7": {
+            "dt_mean": 100.00217391304348,
+            "dt_std": 0.7024767148964047,
+            "hz": 9.999782613421447,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vtb8": {
+            "dt_mean": 100.0,
+            "dt_std": 0.9276689685132454,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vtb9": {
+            "dt_mean": 99.99778270509978,
+            "dt_std": 0.6936483813514169,
+            "hz": 10.000221734406528,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vw10": {
+            "dt_mean": 100.0,
+            "dt_std": 0.6811032885753389,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vw11": {
+            "dt_mean": 100.0,
+            "dt_std": 0.7802576215521512,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vw12": {
+            "dt_mean": 100.0,
+            "dt_std": 0.6554860342618467,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vw13": {
+            "dt_mean": 100.0,
+            "dt_std": 0.7280352571744352,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vw14a": {
+            "dt_mean": 100.0,
+            "dt_std": 0.7549644429832117,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vw14b": {
+            "dt_mean": 100.00005105427068,
+            "dt_std": 0.755064923159475,
+            "hz": 9.999994894575538,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vw14c": {
+            "dt_mean": 100.0,
+            "dt_std": 0.7551403623331523,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vw16a": {
+            "dt_mean": 99.99982987410684,
+            "dt_std": 0.7164284965882735,
+            "hz": 10.00001701261826,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vw16b": {
+            "dt_mean": 100.0008888888889,
+            "dt_std": 0.7099290174915681,
+            "hz": 9.999911111901227,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vw17": {
+            "dt_mean": 100.0030487804878,
+            "dt_std": 0.7428458610170889,
+            "hz": 9.999695131245998,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vw3": {
+            "dt_mean": 100.00025906735752,
+            "dt_std": 0.7423181274320034,
+            "hz": 9.999974093331364,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vw5": {
+            "dt_mean": 100.00098911968348,
+            "dt_std": 0.7025451897918175,
+            "hz": 9.99990108901,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vw6": {
+            "dt_mean": 100.0,
+            "dt_std": 0.6696547617989437,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vw7": {
+            "dt_mean": 99.99937539038102,
+            "dt_std": 0.7126059430710464,
+            "hz": 10.000062461352037,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Vw8": {
+            "dt_mean": 100.0,
+            "dt_std": 0.7423254814559771,
+            "hz": 10.0,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        },
+        "Y1": {
+            "dt_mean": 99.99850599735348,
+            "dt_std": 0.8752597553304513,
+            "hz": 10.00014940249673,
+            "accel_cols": [
+                "ACCELEROMETER X (m/s\u00b2)",
+                "ACCELEROMETER Y (m/s\u00b2)",
+                "ACCELEROMETER Z (m/s\u00b2)"
+            ],
+            "gyro_cols": [
+                "GYROSCOPE X (rad/s)",
+                "GYROSCOPE Y (rad/s)",
+                "GYROSCOPE Z (rad/s)"
+            ],
+            "vel_col_raw": "Velocity (km/hr)",
+            "has_nan_imputed": false
+        }
+    }
+}

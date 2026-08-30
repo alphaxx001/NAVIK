@@ -1,0 +1,31 @@
+{
+  "dataset": {
+    "root_dir": "data/raw/IO-VNBD/Synchronised V abd S datasets/Uncategorised IOVNB Dataset",
+    "s_dir_name": "S-Dataset",
+    "v_dir_name": "V-Dataset"
+  },
+  "processing": {
+    "target_sampling_rate_hz": 10.0,
+    "handle_nan": "interpolate",
+    "encoding": "latin1",
+    "features": [
+      "ACCELEROMETER X (m/s\u00b2)",
+      "ACCELEROMETER Y (m/s\u00b2)",
+      "ACCELEROMETER Z (m/s\u00b2)",
+      "GYROSCOPE X (rad/s)",
+      "GYROSCOPE Y (rad/s)",
+      "GYROSCOPE Z (rad/s)"
+    ],
+    "target": "velocity_m_s"
+  },
+  "windowing": {
+    "duration_s": 2.0,
+    "sample_count": 20,
+    "stride": 1,
+    "target_definition": "end_of_window"
+  },
+  "paths": {
+    "manifests_dir": "data/manifests",
+    "outputs_dir": "ml/data/outputs"
+  }
+}
