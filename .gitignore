@@ -1,0 +1,33 @@
+# Ignore large dataset folders
+data/raw/
+data/processed/
+
+# Do NOT ignore manifests
+!data/manifests/
+
+# Ignore python caches
+__pycache__/
+*.pyc
+
+# Ignore ML output models and checkpoints locally
+ml/export/*.tflite
+ml/export/*.onnx
+*.pth
+*.pt
+
+# Build directories
+build/
+cmake-build-*/
+third_party/
+eigen.zip
+
+# C++ binaries
+*.exe
+*.dll
+*.so
+*.a
+*.lib
+
+# OS generated
+.DS_Store
+Thumbs.db

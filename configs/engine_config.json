@@ -1,0 +1,36 @@
+{
+  "system": {
+    "target_update_rate_hz": 100,
+    "log_level": "INFO"
+  },
+  "models": {
+    "speednet": {
+      "path": "ml/export/speednet.tflite",
+      "window_size_samples": 20,
+      "sampling_rate_hz": 10,
+      "enable_inference": true
+    },
+    "attitudenet": {
+      "path": "ml/export/attitudenet.tflite",
+      "enable_inference": false
+    }
+  },
+  "filter": {
+    "type": "ESKF",
+    "enable_nhc": true,
+    "enable_zupt": true,
+    "enable_zihr": true,
+    "initial_variances": {
+      "position": 1.0,
+      "velocity": 0.1,
+      "attitude": 0.01,
+      "accel_bias": 0.01,
+      "gyro_bias": 0.001
+    }
+  },
+  "map_matching": {
+    "enable": false,
+    "map_database_path": "map/runtime/local_area.osm.pbf",
+    "search_radius_m": 50.0
+  }
+}

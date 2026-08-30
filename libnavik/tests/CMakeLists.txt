@@ -1,0 +1,3 @@
+cmake_minimum_required(VERSION 3.14)
+add_executable(test_interfaces test_interfaces.cpp)
+target_link_libraries(test_interfaces PRIVATE navik_interfaces)
