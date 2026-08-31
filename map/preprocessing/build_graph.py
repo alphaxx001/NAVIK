@@ -2,6 +2,7 @@ import os
 import json
 import pandas as pd
 import numpy as np
+import osmium
 
 def latlon_to_enu(lat, lon, lat0, lon0):
     R_earth = 6378137.0
@@ -13,101 +14,118 @@ def latlon_to_enu(lat, lon, lat0, lon0):
     x = R_earth * np.cos(lat0_rad) * d_lon
     return x, y
 
-def synthesize_osm_from_gnss(session_id):
-    """
-    Since outgoing internet access to Overpass API is blocked, this synthesizes 
-    an OSM-like road network by tracing the vehicle's GNSS path and adding 
-    artificial parallel/perpendicular ambiguous roads (to prevent trivial cheating).
-    """
-    inventory = pd.read_csv("data/manifests/session_inventory.csv")
-    row = inventory[inventory['session_id'] == session_id]
-    if len(row) == 0: return None, None
-    v_path = row.iloc[0]['v_file']
-    
-    v_df = pd.read_csv(v_path, encoding='latin1', on_bad_lines='skip')
-    v_df.columns = [c.strip() for c in v_df.columns]
-    lat = v_df['Latitude (degrees)'].dropna().values
-    lon = v_df['Longitude (degrees)'].dropna().values
-    
-    if len(lat) == 0: return None, None
-    
-    origin = (lat[0], lon[0])
-    
-    ways = []
-    
-    # Subsample GNSS to create discrete road nodes (e.g. every 20 meters)
-    nodes = []
-    last_node = None
-    for i in range(0, len(lat), 10):
-        x, y = latlon_to_enu(lat[i], lon[i], origin[0], origin[1])
-        if last_node is None:
-            nodes.append({'x': x, 'y': y})
-            last_node = (x, y)
-        else:
-            dist = np.sqrt((x - last_node[0])**2 + (y - last_node[1])**2)
-            if dist > 20.0:
-                nodes.append({'x': x, 'y': y})
-                last_node = (x, y)
-                
-    # Build main road way
-    segment_id_counter = 0
-    for i in range(len(nodes)-1):
-        x1, y1 = nodes[i]['x'], nodes[i]['y']
-        x2, y2 = nodes[i+1]['x'], nodes[i+1]['y']
-        dx, dy = x2 - x1, y2 - y1
-        heading = (np.arctan2(dx, dy) + 2*np.pi) % (2*np.pi)
-        length = np.sqrt(dx**2 + dy**2)
-        
-        ways.append({
-            'id': f"road_{segment_id_counter}",
-            'n1': f"n_{i}", 'n2': f"n_{i+1}",
-            'x1': x1, 'y1': y1,
-            'x2': x2, 'y2': y2,
-            'heading': heading,
-            'length': length,
-            'oneway': False,
-            'type': 'primary'
-        })
-        segment_id_counter += 1
-        
-        # Add ambiguous parallel road (30 meters offset)
-        perp_heading = heading + np.pi/2
-        ox = 30.0 * np.sin(perp_heading)
-        oy = 30.0 * np.cos(perp_heading)
-        ways.append({
-            'id': f"road_{segment_id_counter}",
-            'n1': f"pn_{i}", 'n2': f"pn_{i+1}",
-            'x1': x1 + ox, 'y1': y1 + oy,
-            'x2': x2 + ox, 'y2': y2 + oy,
-            'heading': heading,
-            'length': length,
-            'oneway': False,
-            'type': 'residential'
-        })
-        segment_id_counter += 1
-
-    return ways, origin
-
 def build_offline_map():
+    pbf_file = "data/raw/OSM/uk_midlands.osm.pbf"
+    if not os.path.exists(pbf_file):
+        print(f"Error: OSM data not found at {pbf_file}")
+        return
+        
+    inventory = pd.read_csv("data/manifests/session_inventory.csv")
     with open("data/manifests/test_sessions.json", "r") as f:
         test_sessions = json.load(f)
+    with open("data/manifests/val_sessions.json", "r") as f:
+        val_sessions = json.load(f)
+    test_sessions = test_sessions + val_sessions
         
-    os.makedirs("map/osm", exist_ok=True)
+    # 1. Determine bounding boxes and origins for all sessions
+    session_bboxes = {}
+    session_origins = {}
+    margin = 0.05
+    for sess in test_sessions:
+        row = inventory[inventory['session_id'] == sess]
+        if len(row) == 0: continue
+        v_path = row.iloc[0]['v_file']
+        try:
+            df = pd.read_csv(v_path, encoding='latin1', on_bad_lines='skip')
+            df.columns = [c.strip() for c in df.columns]
+            lat = df['Latitude (degrees)'].dropna().values
+            lon = df['Longitude (degrees)'].dropna().values
+            if len(lat) > 0:
+                min_lat, max_lat = lat.min(), lat.max()
+                min_lon, max_lon = lon.min(), lon.max()
+                session_bboxes[sess] = (min_lat - margin, max_lat + margin, min_lon - margin, max_lon + margin)
+                session_origins[sess] = (lat[0], lon[0])
+        except Exception as e:
+            pass
+
+    # Excluded highway types
+    excluded_highways = {'footway', 'pedestrian', 'steps', 'corridor', 'path', 'cycleway', 'track', 'proposed', 'construction', 'abandoned', 'platform', 'raceway'}
+
+    class HighwayHandler(osmium.SimpleHandler):
+        def __init__(self):
+            super().__init__()
+            self.ways_per_session = {sess: [] for sess in session_bboxes.keys()}
+            
+        def way(self, w):
+            if 'highway' not in w.tags: return
+            if w.tags['highway'] in excluded_highways: return
+            try:
+                matched_sessions = set()
+                for n in w.nodes:
+                    lat, lon = n.lat, n.lon
+                    for sess, bbox in session_bboxes.items():
+                        if sess not in matched_sessions and bbox[0] <= lat <= bbox[1] and bbox[2] <= lon <= bbox[3]:
+                            matched_sessions.add(sess)
+                
+                if matched_sessions:
+                    way_dict = {
+                        'id': w.id,
+                        'oneway': w.tags.get('oneway', 'no') == 'yes',
+                        'type': w.tags['highway'],
+                        'nodes': [(nd.ref, nd.lat, nd.lon) for nd in w.nodes]
+                    }
+                    for sess in matched_sessions:
+                        self.ways_per_session[sess].append(way_dict)
+            except osmium.InvalidLocationError:
+                pass
+
+    print("Parsing OSM PBF file... (This may take a minute for 300MB)")
+    handler = HighwayHandler()
+    handler.apply_file(pbf_file, locations=True)
+
+    print("Building local ENU graphs...")
     os.makedirs("map/runtime", exist_ok=True)
     
-    for sess in test_sessions:
-        print(f"Synthesizing OSM-like graph for session {sess}...")
-        ways, origin = synthesize_osm_from_gnss(sess)
-        if not ways: continue
-                    
+    for sess in session_bboxes.keys():
+        origin = session_origins[sess]
+        ways = []
+        
+        for w in handler.ways_per_session[sess]:
+            way_nodes = w['nodes']
+            if len(way_nodes) < 2: continue
+            
+            for i in range(len(way_nodes)-1):
+                n1_ref, n1_lat, n1_lon = way_nodes[i]
+                n2_ref, n2_lat, n2_lon = way_nodes[i+1]
+                
+                x1, y1 = latlon_to_enu(n1_lat, n1_lon, origin[0], origin[1])
+                x2, y2 = latlon_to_enu(n2_lat, n2_lon, origin[0], origin[1])
+                
+                dx = x2 - x1
+                dy = y2 - y1
+                heading = (np.arctan2(dx, dy) + 2*np.pi) % (2*np.pi)
+                length = np.sqrt(dx**2 + dy**2)
+                
+                ways.append({
+                    'id': f"{w['id']}_{i}",
+                    'way_id': w['id'],
+                    'n1': n1_ref,
+                    'n2': n2_ref,
+                    'x1': x1, 'y1': y1,
+                    'x2': x2, 'y2': y2,
+                    'heading': heading,
+                    'length': length,
+                    'oneway': w['oneway'],
+                    'type': w['type']
+                })
+                
         out_file = f"map/runtime/{sess}_graph.json"
         with open(out_file, "w") as f:
             json.dump({
                 "origin": {"lat": origin[0], "lon": origin[1]},
                 "segments": ways
             }, f)
-            
-        print(f"  Saved {len(ways)} synthetic road segments to {out_file}.")
+        print(f"  Saved {len(ways)} real OSM segments to {out_file}.")
 
 if __name__ == "__main__":
     build_offline_map()

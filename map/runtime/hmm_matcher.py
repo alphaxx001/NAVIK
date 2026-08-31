@@ -31,18 +31,22 @@ class HMMMapMatcher:
     def get_candidates(self, px, py, ph):
         candidates = []
         for s in self.segments:
+            # Fast BBox check
+            min_x = min(s['x1'], s['x2']) - self.search_radius
+            max_x = max(s['x1'], s['x2']) + self.search_radius
+            if px < min_x or px > max_x: continue
+            
+            min_y = min(s['y1'], s['y2']) - self.search_radius
+            max_y = max(s['y1'], s['y2']) + self.search_radius
+            if py < min_y or py > max_y: continue
+            
             d, proj_x, proj_y = point_to_segment_dist(px, py, s['x1'], s['y1'], s['x2'], s['y2'])
             if d < self.search_radius:
-                # Oneway check: if heading difference is huge and road is oneway, penalty?
-                # Actually, just compute heading diff.
                 h_diff = abs(angle_diff(ph, s['heading']))
-                
-                # Bi-directional support (if not strictly oneway, we can match the opposite heading)
                 if not s['oneway']:
                     h_diff_rev = abs(angle_diff(ph, (s['heading'] + np.pi) % (2*np.pi)))
                     h_diff = min(h_diff, h_diff_rev)
                 
-                # Emission cost (negative log probability)
                 emission = (d / self.sigma_d)**2 + (h_diff / self.sigma_h)**2
                 
                 candidates.append({
@@ -59,9 +63,9 @@ class HMMMapMatcher:
     def viterbi_match(self, trajectory):
         """
         trajectory: list of dicts [{'x': x, 'y': y, 'h': h_rad}]
-        Returns: list of map-matched (x, y)
+        Returns: list of map-matched (x, y), list of states ('MAP_MATCHED' or 'DR_FALLBACK')
         """
-        if len(trajectory) == 0: return []
+        if len(trajectory) == 0: return [], []
         
         # Trellis: layer_idx -> {candidate_id: {'cost': float, 'prev': id, 'proj_x': x, 'proj_y': y}}
         trellis = []
@@ -70,7 +74,6 @@ class HMMMapMatcher:
         first_pt = trajectory[0]
         cands = self.get_candidates(first_pt['x'], first_pt['y'], first_pt['h'])
         if not cands:
-            # Fallback to pure DR if no road found
             layer = {'DR_FALLBACK': {'cost': 0, 'prev': None, 'proj_x': first_pt['x'], 'proj_y': first_pt['y'], 'is_fallback': True}}
         else:
             layer = {}
@@ -87,7 +90,6 @@ class HMMMapMatcher:
             current_layer = {}
             
             if not cands:
-                # Force fallback
                 best_prev = min(prev_layer.items(), key=lambda x: x[1]['cost'])
                 current_layer['DR_FALLBACK'] = {
                     'cost': best_prev[1]['cost'], 
@@ -103,9 +105,8 @@ class HMMMapMatcher:
                     
                     for prev_id, prev_node in prev_layer.items():
                         if prev_node['is_fallback']:
-                            trans_cost = 0 # No topological constraint from fallback
+                            trans_cost = 0
                         else:
-                            # Distance between projections vs distance driven
                             dp = np.sqrt((c['proj_x'] - prev_node['proj_x'])**2 + (c['proj_y'] - prev_node['proj_y'])**2)
                             d_dr = np.sqrt((pt['x'] - trajectory[t-1]['x'])**2 + (pt['y'] - trajectory[t-1]['y'])**2)
                             trans_cost = abs(dp - d_dr) / self.sigma_t
@@ -127,6 +128,7 @@ class HMMMapMatcher:
             
         # Backtracking
         matched = []
+        states = []
         last_layer = trellis[-1]
         best_end = min(last_layer.items(), key=lambda x: x[1]['cost'])[0]
         
@@ -134,6 +136,7 @@ class HMMMapMatcher:
         for t in range(len(trajectory)-1, -1, -1):
             node = trellis[t][curr_id]
             matched.append((node['proj_x'], node['proj_y']))
+            states.append("DR_FALLBACK" if node['is_fallback'] else "MAP_MATCHED")
             curr_id = node['prev']
             
-        return matched[::-1]
+        return matched[::-1], states[::-1]

@@ -42,7 +42,7 @@ def load_models(device):
     
     return speednet, motionnet, headingnet
 
-def extract_windows(df_imu, imu_schema, window_size=200):
+def extract_windows(df_imu, imu_schema, window_size=20):
     gx = df_imu[imu_schema['gyro_x']].values; gy = df_imu[imu_schema['gyro_y']].values; gz = df_imu[imu_schema['gyro_z']].values
     ax = df_imu[imu_schema['accel_x']].values; ay = df_imu[imu_schema['accel_y']].values; az = df_imu[imu_schema['accel_z']].values
     
@@ -132,7 +132,7 @@ def run_pipeline(session_id="Vta1a", output_dir="outputs"):
     
     # 4. ESKF Propagation (Absolute Zero GNSS consumption here)
     for i in range(1, len(p_speed)):
-        idx = i + 199 # align with window end
+        idx = i + 19 # align with window end
         if idx >= len(t_ms): break
         dt = t_imu[idx] - t_imu[idx-1]
         if dt <= 0: dt = 0.01

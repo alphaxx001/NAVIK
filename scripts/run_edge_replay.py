@@ -51,11 +51,11 @@ def run_replay(session_id="Vta1a"):
     blackout_end = 2000.0
     
     # Pre-warm buffer
-    for i in range(199):
+    for i in range(19):
         engine.sensor_buffer.add_sample(t_imu[i], accel[i], gyro[i])
         engine.sample_count += 1
         
-    for i in range(199, len(t_imu)):
+    for i in range(19, len(t_imu)):
         cur_t_rel = t_imu[i] - t_imu[0]
         gnss_avail = not (blackout_start <= cur_t_rel <= blackout_end)
         
