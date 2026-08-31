@@ -1,7 +1,7 @@
 import numpy as np
 
 class SensorBuffer:
-    def __init__(self, window_size=200):
+    def __init__(self, window_size=20):
         self.window_size = window_size
         self.buffer = []
         

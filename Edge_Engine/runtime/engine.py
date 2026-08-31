@@ -24,7 +24,7 @@ from Edge_Engine.runtime.navigation_output import NavigationOutput
 
 class EdgeEngine:
     def __init__(self, map_graph_file):
-        self.sensor_buffer = SensorBuffer(window_size=200)
+        self.sensor_buffer = SensorBuffer(window_size=20)
         self.model_runner = ModelRunner(device_str="cpu")
         self.state_machine = NavigationStateMachine()
         self.eskf = ESKF()
@@ -40,7 +40,7 @@ class EdgeEngine:
         # Hysteresis for motion state
         self.motion_history = []
         self.trajectory_buffer = []
-        self.inference_freq = 10 # Process NNs every 10 IMU samples
+        self.inference_freq = 1 # Process NNs every IMU sample (10Hz)
         self.sample_count = 0
         
     def initialize_gnss(self, lat, lon, heading_deg, timestamp):

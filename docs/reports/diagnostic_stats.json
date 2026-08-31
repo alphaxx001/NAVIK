@@ -1,0 +1,19 @@
+{
+    "mm_median_err": 163.717615737622,
+    "fb_median_err": 20404.92304381813,
+    "correction_dist_median": 23.684092674496434,
+    "correction_dist_mean": 31.729285354534397,
+    "correction_dist_max": 99.97034694815481,
+    "fb_causes": {
+        "A": 3617,
+        "B/C/D": 0
+    },
+    "rad_distrib": {
+        "25": 182,
+        "50": 59,
+        "100": 78,
+        "200": 35,
+        "500": 102
+    },
+    "rad_pts": 1036
+}
