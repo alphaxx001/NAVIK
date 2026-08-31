@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.chaquo.python")
 }
 
 android {
@@ -14,6 +15,26 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        ndk {
+            abiFilters += listOf("arm64-v8a", "x86_64")
+        }
+    }
+    
+    chaquopy {
+        defaultConfig {
+            version = "3.8"
+            buildPython("python")
+            pip {
+                install("numpy")
+                install("scipy")
+            }
+        }
+        sourceSets {
+            getByName("main") {
+                srcDir("../../Edge_Engine")
+            }
+        }
     }
 
     buildTypes {
