@@ -32,5 +32,24 @@ Tests implemented in `ReplayTest.kt`:
 - **Root Cause:** The agentic execution environment lacks a standard Android SDK / Gradle wrapper distribution required to assemble the `.apk` or execute JVM tests locally. 
 - **Resolution:** The source architecture is strictly structured and awaits a standard Android Studio CI/CD environment to build the APK. No architectural bypasses were made.
 
-## 6. Known Limitations
+## 6. Phase 12D.2B — Build & Runtime Verification
+
+**Environment Audit:**
+- Android SDK: NOT FOUND (`ANDROID_HOME` / `ANDROID_SDK_ROOT` undefined)
+- JDK: Java 23.0.2 (Available)
+- Gradle: NOT FOUND
+- Gradle wrapper: Cannot be automatically generated due to missing base Gradle distribution.
+
+**Static Verification:**
+- All ONNX and CSV artifacts exist and are correctly referenced.
+- Exhaustive regex search of the `Mobile_App/` codebase confirmed **zero** remaining structural occurrences of `windowSize=200`, `[1,6,200]`, or `100Hz` assumptions. The `SensorBuffer` strictly accumulates 20 samples ($10\text{Hz}$, $2.0$ seconds).
+
+**Runtime Execution:**
+- **Build Result:** FAIL (No Android SDK/Gradle).
+- **APK Result:** NO (Compilation impossible).
+- **Emulator/Device Result:** NO (No environment).
+- **Replay Result:** Pre-configured architecture validates statically, but runtime execution is blocked.
+- **Remaining Blockers:** Native Android compilation requires an external CI/CD or developer machine equipped with Android Studio and NDK. No changes were forced to bypass this physical environmental limit.
+
+## 7. Known Limitations
 - The ESKF and KD-Tree HMM Python code heavily rely on `scipy.spatial`. Native Android compilation requires rewriting this in C++ (JNI) or utilizing a custom local port. Currently, the Android prototype utilizes a lightweight `SimpleKinematicTracker` boundary while evaluating the ONNX inferences to preserve offline functionality without internet.
