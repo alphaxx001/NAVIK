@@ -86,7 +86,9 @@ class NavikDashboard {
             flowCardLabel: document.getElementById('flowCardLabel'),
             flowCardHero: document.getElementById('flowCardHero'),
             flowHeroNum: document.getElementById('flowHeroNum'),
-            flowHeroUnit: document.getElementById('flowHeroUnit')
+            flowHeroUnit: document.getElementById('flowHeroUnit'),
+            btnToggleDrawer: document.getElementById('btnToggleDrawer'),
+            cockpitDrawer: document.getElementById('cockpitDrawer')
         };
 
         // Sequential 4-State Engine
@@ -411,6 +413,16 @@ class NavikDashboard {
                     const stepNum = parseInt(btn.dataset.step, 10);
                     this.setFlowState(stepNum, false);
                 });
+            });
+        }
+
+        // Collapsible Cockpit Controls Drawer Toggle
+        if (this.dom.btnToggleDrawer && this.dom.cockpitDrawer) {
+            this.dom.btnToggleDrawer.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.dom.cockpitDrawer.classList.toggle('hidden');
+                this.dom.btnToggleDrawer.classList.toggle('active');
+                setTimeout(() => this.map && this.map.invalidateSize(), 200);
             });
         }
     }
@@ -942,7 +954,7 @@ class NavikDashboard {
             if (confBadge) confBadge.classList.add('hidden');
 
             if (bottomCard) {
-                bottomCard.className = 'flow-bottom-card state-1';
+                bottomCard.className = 'cockpit-hero-row flow-bottom-card state-1';
                 if (cardLabel) cardLabel.innerText = 'SPEED';
                 if (cardHero) cardHero.innerHTML = `${Math.round(this.currentSpeed || 42)} <span class="hero-unit">km/h</span>`;
             }
@@ -973,7 +985,7 @@ class NavikDashboard {
             if (confBadge) confBadge.classList.add('hidden');
 
             if (bottomCard) {
-                bottomCard.className = 'flow-bottom-card state-2';
+                bottomCard.className = 'cockpit-hero-row flow-bottom-card state-2';
                 if (cardLabel) cardLabel.innerText = 'SWITCHING TO';
                 if (cardHero) cardHero.innerHTML = `<span style="color:#f59e0b">Dead reckoning</span>`;
             }
@@ -1008,7 +1020,7 @@ class NavikDashboard {
             }
 
             if (bottomCard) {
-                bottomCard.className = 'flow-bottom-card state-3';
+                bottomCard.className = 'cockpit-hero-row flow-bottom-card state-3';
                 if (cardLabel) cardLabel.innerText = 'BLACKOUT TIME';
                 if (cardHero) cardHero.innerHTML = `<span style="color:#f59e0b" id="flowBlackoutTimer">${this.formatBlackoutTime(this.blackoutElapsedSecs)}</span>`;
             }
@@ -1049,7 +1061,7 @@ class NavikDashboard {
             if (confBadge) confBadge.classList.add('hidden');
 
             if (bottomCard) {
-                bottomCard.className = 'flow-bottom-card state-4';
+                bottomCard.className = 'cockpit-hero-row flow-bottom-card state-4';
                 if (cardLabel) cardLabel.innerText = 'POSITION';
                 if (cardHero) cardHero.innerHTML = `<span style="color:#10b981">Corrected</span>`;
             }

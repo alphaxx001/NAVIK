@@ -221,11 +221,14 @@ body {
     font-size: 13px;
 }
 
-/* In Driver Mode: Hide intimidating engineering telemetry */
-body.driver-mode .metrics-card,
-body.driver-mode .waveforms-card,
-body.driver-mode .tech-card {
+/* In Driver Mode: Clean, distraction-free cockpit */
+body.driver-mode .status-cluster,
+body.driver-mode .telemetry-panel {
     display: none !important;
+}
+
+body.driver-mode .dashboard-grid {
+    grid-template-columns: 1fr !important;
 }
 
 /* Status Cluster */
@@ -738,22 +741,10 @@ body.driver-mode .tech-card {
 }
 
 /* ==========================================================================
-   GNSS Blackout Flow Component Set (SIH 26168 Sequential 4-State Visual UI)
+   GNSS Blackout Flow Component Set & Unified Cockpit (SIH 26168)
    ========================================================================== */
-.gnss-flow-overlay {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    right: 10px;
-    bottom: 0px;
-    pointer-events: none;
-    z-index: 850;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
 
-/* Stepper toolbar for 5-second judge presentation */
+/* Stepper toolbar for 5-second reviewer presentation (in Top Nav) */
 .flow-state-stepper {
     display: flex;
     align-items: center;
@@ -764,10 +755,7 @@ body.driver-mode .tech-card {
     padding: 3px 8px;
     backdrop-filter: blur(12px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    pointer-events: auto;
-    margin-bottom: 6px;
-    max-width: 100%;
-    overflow-x: auto;
+    flex-shrink: 0;
 }
 
 .stepper-tag {
@@ -814,6 +802,20 @@ body.driver-mode .tech-card {
     box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
 }
 
+/* Floating Over-Map Chrome: Centered Status Pill, Banner, and Confidence Badge */
+.gnss-map-chrome {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    pointer-events: none;
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
 /* Top Status Pill (floating, rounded, semi-transparent dark surface) */
 .flow-status-pill {
     display: flex;
@@ -821,10 +823,10 @@ body.driver-mode .tech-card {
     gap: 8px;
     border-radius: 999px;
     padding: 6px 18px;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 700;
     font-family: var(--font-main);
-    background: rgba(15, 23, 42, 0.9);
+    background: rgba(15, 23, 42, 0.92);
     backdrop-filter: blur(12px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
     pointer-events: auto;
@@ -858,34 +860,30 @@ body.driver-mode .tech-card {
 
 /* Slide-in Amber Banner (State 2) */
 .flow-slide-banner {
-    position: absolute;
-    top: 48px;
-    left: 12px;
-    right: 12px;
-    max-width: 440px;
+    position: relative;
+    max-width: 90%;
     margin: 0 auto;
-    background: #0f172a;
+    background: rgba(15, 23, 42, 0.95);
     border: 1px solid rgba(245, 158, 11, 0.4);
     border-top: 3px solid #f59e0b;
     border-radius: 8px;
-    padding: 9px 14px;
+    padding: 8px 14px;
     display: flex;
     align-items: center;
     gap: 10px;
     color: #f59e0b;
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65);
     pointer-events: auto;
-    animation: bannerSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: 870;
+    animation: bannerSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes bannerSlideIn {
     from {
         opacity: 0;
-        transform: translateY(-16px);
+        transform: translateY(-12px);
     }
     to {
         opacity: 1;
@@ -896,8 +894,8 @@ body.driver-mode .tech-card {
 /* Floating Match Confidence Readout (State 3: 72% match) */
 .flow-confidence-badge {
     position: absolute;
-    top: 48px;
-    right: 12px;
+    top: 0;
+    left: 0;
     background: rgba(15, 23, 42, 0.92);
     border: 1px solid rgba(245, 158, 11, 0.4);
     border-radius: 8px;
@@ -906,7 +904,6 @@ body.driver-mode .tech-card {
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     pointer-events: auto;
-    z-index: 860;
 }
 
 .conf-num {
@@ -927,41 +924,40 @@ body.driver-mode .tech-card {
     letter-spacing: 0.06em;
 }
 
-/* Floating Bottom Card (rounded top corners, solid surface, subtle elevation) */
-.flow-bottom-card {
-    position: absolute;
-    bottom: 0px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 24px);
-    max-width: 420px;
-    background: #0f172a;
-    border-radius: 18px 18px 0 0;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-bottom: none;
-    padding: 8px 18px 12px;
-    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.6);
-    pointer-events: auto;
-    transition: all 0.25s ease;
-    z-index: 860;
+/* ==========================================================================
+   Unified Docked Bottom Cockpit System (Zero Overlap!)
+   ========================================================================== */
+.nav-cockpit-bottom {
+    position: relative;
+    width: 100%;
+    background: rgba(10, 16, 28, 0.96);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    z-index: 600;
+    flex-shrink: 0;
 }
 
-.card-drag-handle {
-    width: 32px;
-    height: 3.5px;
-    background: rgba(255, 255, 255, 0.22);
-    border-radius: 2px;
-    margin: 0 auto 6px;
+.cockpit-hero-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    gap: 12px;
+    transition: all 0.25s ease;
 }
 
 .card-metric-block {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
+    min-width: 80px;
 }
 
 .card-metric-label {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     color: #64748b;
     letter-spacing: 0.08em;
@@ -969,36 +965,131 @@ body.driver-mode .tech-card {
 }
 
 .card-metric-hero {
-    font-size: 30px;
+    font-size: 24px;
     font-weight: 800;
     font-family: var(--font-main);
     line-height: 1.1;
     letter-spacing: -0.01em;
+    color: #ffffff;
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
 }
 
-.flow-bottom-card.state-1 .card-metric-hero {
+.cockpit-hero-row.state-1 .card-metric-hero {
     color: #ffffff;
 }
 
-.flow-bottom-card.state-2 .card-metric-hero {
+.cockpit-hero-row.state-2 .card-metric-hero {
     color: #f59e0b;
-    font-size: 24px;
+    font-size: 19px;
 }
 
-.flow-bottom-card.state-3 .card-metric-hero {
+.cockpit-hero-row.state-3 .card-metric-hero {
     color: #f59e0b;
     font-family: var(--font-mono);
+    font-size: 20px;
 }
 
-.flow-bottom-card.state-4 .card-metric-hero {
+.cockpit-hero-row.state-4 .card-metric-hero {
     color: #10b981;
+    font-size: 20px;
 }
 
 .hero-unit {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
     color: #94a3b8;
-    margin-left: 3px;
+    margin-left: 2px;
+}
+
+/* Quick Action Controls in Cockpit */
+.cockpit-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+.btn-action-play {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--neon-cyan), #00b4d8);
+    color: #04070d;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-action-play:hover {
+    transform: scale(1.06);
+    box-shadow: 0 0 22px rgba(0, 240, 255, 0.7);
+}
+
+.btn-action-pill {
+    padding: 7px 11px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    border: none;
+    transition: all 0.2s ease;
+    font-family: var(--font-main);
+}
+
+.btn-action-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-action-icon:hover, .btn-action-icon.active {
+    background: rgba(0, 240, 255, 0.2);
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+}
+
+/* Collapsible Drawer for Timeline & Speeds */
+.cockpit-drawer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 16px 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(6, 10, 18, 0.75);
+    animation: drawerSlideDown 0.2s ease-out;
+}
+
+@keyframes drawerSlideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.drawer-controls-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 /* Marker State Pulses & Styles */
@@ -1658,48 +1749,138 @@ body.in-fullscreen-map .telemetry-panel {
 }
 
 @media (max-width: 768px) {
-    body {
-        overflow-y: auto !important;
+    /* Driver Mode Mobile: App-like full viewport experience with ZERO vertical scroll */
+    body.driver-mode {
+        overflow: hidden !important;
     }
 
-    .app-container {
-        height: auto !important;
-        min-height: 100vh;
-        padding: 8px !important;
-        gap: 10px !important;
+    body.driver-mode .app-container {
+        height: 100vh !important;
+        height: 100dvh !important;
+        overflow: hidden !important;
+        padding: 6px !important;
+        gap: 6px !important;
     }
 
-    /* Top Nav: Streamlined and compact */
-    .top-nav {
+    body.driver-mode .dashboard-grid {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        display: flex !important;
         flex-direction: column !important;
-        align-items: stretch !important;
-        padding: 10px 12px !important;
-        gap: 8px !important;
+    }
+
+    body.driver-mode .map-section {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        height: 100% !important;
+        max-height: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        position: relative !important;
+        overflow: hidden !important;
         border-radius: 12px !important;
     }
 
+    body.driver-mode .panel-header {
+        display: none !important;
+    }
+
+    body.driver-mode .map-viewport {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    /* Engineer Mode Mobile: Scrollable telemetry inspection */
+    body:not(.driver-mode) {
+        overflow-y: auto !important;
+    }
+
+    body:not(.driver-mode) .app-container {
+        height: auto !important;
+        min-height: 100vh;
+        padding: 8px !important;
+        gap: 8px !important;
+    }
+
+    body:not(.driver-mode) .map-section {
+        height: 55vh !important;
+        min-height: 380px !important;
+    }
+
+    /* Top Nav: Two clean non-overlapping rows */
+    .top-nav {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 8px 10px !important;
+        gap: 6px !important;
+        border-radius: 12px !important;
+        flex-shrink: 0 !important;
+    }
+
     .brand-group {
-        width: 100%;
-        justify-content: space-between;
-        align-items: center;
+        order: 1 !important;
+        gap: 8px !important;
     }
 
     .logo-badge {
-        width: 34px;
-        height: 34px;
-        font-size: 18px;
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 16px !important;
     }
 
     .brand-name {
-        font-size: 19px !important;
+        font-size: 18px !important;
     }
 
     .brand-subtitle {
-        display: none !important; /* Hide long subtitle on phones to free up screen */
+        display: none !important;
     }
 
-    /* Status Cluster: Sleek 2-column grid on mobile */
+    .tag-edge {
+        display: none !important;
+    }
+
+    .view-toggle-group {
+        order: 2 !important;
+    }
+
+    .btn-view-toggle {
+        font-size: 10px !important;
+        padding: 5px 8px !important;
+    }
+
+    /* Stepper toolbar takes full Row 2 */
+    .flow-state-stepper {
+        order: 3 !important;
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 3px 6px !important;
+        gap: 3px !important;
+        margin: 2px 0 0 0 !important;
+        overflow-x: auto !important;
+    }
+
+    .stepper-tag {
+        font-size: 9px !important;
+        padding: 0 4px 0 2px !important;
+    }
+
+    .btn-flow-step {
+        flex: 1 1 auto !important;
+        text-align: center !important;
+        padding: 4px 6px !important;
+        font-size: 9.5px !important;
+    }
+
+    /* Status cluster (only in Engineer HUD) */
     .status-cluster {
+        order: 4 !important;
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
         gap: 6px !important;
@@ -1720,183 +1901,144 @@ body.in-fullscreen-map .telemetry-panel {
         font-size: 11px !important;
     }
 
-    /* Dashboard Layout */
-    .dashboard-grid {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 10px !important;
+    /* GNSS Over-Map Chrome */
+    .gnss-map-chrome {
+        top: 8px !important;
+        left: 8px !important;
+        right: 8px !important;
+        gap: 6px !important;
     }
 
-    /* Map Viewport for mobile — IMMERSIVE & COMMANDING */
-    .map-section {
-        height: 68vh !important;
-        min-height: 520px !important;
-        max-height: 80vh !important;
-        display: flex !important;
-        flex-direction: column !important;
-        flex: 1 0 auto !important;
-        border-radius: 14px !important;
+    .flow-status-pill {
+        padding: 5px 14px !important;
+        font-size: 11.5px !important;
     }
 
-    /* In Driver Mode, make map even more prominent */
-    body.driver-mode .map-section {
-        height: 72vh !important;
-        min-height: 540px !important;
+    .flow-slide-banner {
+        max-width: 96% !important;
+        padding: 6px 10px !important;
+        font-size: 10.5px !important;
     }
 
-    .map-viewport {
-        flex: 1 1 auto !important;
-        width: 100% !important;
-        height: 100% !important;
-        min-height: 420px !important;
+    .flow-confidence-badge {
+        top: 0 !important;
+        left: 0 !important;
+        right: auto !important;
+        padding: 4px 7px !important;
     }
 
-    .panel-header {
-        padding: 8px 12px !important;
+    .conf-num {
+        font-size: 13px !important;
+    }
+
+    .conf-sub {
+        font-size: 8px !important;
+    }
+
+    /* Bottom Cockpit: Sleek docked bar on mobile */
+    .nav-cockpit-bottom {
+        padding: 6px 10px 8px !important;
+        gap: 6px !important;
+        border-radius: 14px 14px 0 0 !important;
+    }
+
+    .cockpit-hero-row {
+        padding: 2px 4px !important;
+        gap: 8px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
         flex-wrap: nowrap !important;
     }
 
-    .panel-title {
-        font-size: 11px !important;
+    .card-metric-block {
+        min-width: 60px !important;
+        flex-shrink: 0 !important;
     }
 
-    .map-legend {
-        display: none !important; /* Kept clean so map has maximum area */
+    .card-metric-label {
+        font-size: 8px !important;
     }
 
-    .map-blackout-banner {
-        top: 48px !important;
-        left: 8px !important;
-        max-width: calc(100% - 16px) !important;
-        padding: 6px 10px !important;
-        gap: 8px !important;
-        border-radius: 8px !important;
+    .card-metric-hero {
+        font-size: 19px !important;
     }
 
-    .banner-text strong {
-        font-size: 11px !important;
-    }
-
-    .banner-text span {
-        font-size: 9px !important;
-    }
-
-    .map-hud-overlay {
-        top: 48px !important;
-        right: 8px !important;
-        gap: 4px !important;
-    }
-
-    .hud-pill {
-        padding: 4px 8px !important;
-        min-width: 74px !important;
-        border-radius: 8px !important;
-    }
-
-    .hud-val {
-        font-size: 13px !important;
-    }
-
-    /* GNSS Flow Overlay Mobile Fine-Tuning */
-    .flow-state-stepper {
-        padding: 2px 6px !important;
-        gap: 2px !important;
-    }
-
-    .btn-flow-step {
-        padding: 3px 7px !important;
-        font-size: 9.5px !important;
-    }
-
-    .flow-status-pill {
-        padding: 4px 12px !important;
-        font-size: 11.5px !important;
-    }
-
-    .flow-bottom-card {
-        padding: 6px 14px 10px !important;
-        max-width: calc(100% - 16px) !important;
-    }
-
-    .flow-bottom-card .card-metric-hero {
-        font-size: 24px !important;
-    }
-
-    /* Playback Control Bar: Compact touch-friendly mobile layout */
-    .playback-bar {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        gap: 8px !important;
-        padding: 8px 10px !important;
-        align-items: center !important;
-        background: rgba(10, 16, 28, 0.98) !important;
-    }
-
-    .timeline-container {
-        order: 1 !important;
-        width: 100% !important;
-        flex: 0 0 100% !important;
-        margin-bottom: 2px;
-    }
-
-    .btn-icon {
-        order: 2 !important;
-        width: 38px !important;
-        height: 38px !important;
+    .cockpit-hero-row.state-2 .card-metric-hero {
         font-size: 15px !important;
     }
 
-    .speed-selector {
-        order: 3 !important;
-        flex: 1 !important;
-        justify-content: space-around;
+    .cockpit-hero-row.state-3 .card-metric-hero {
+        font-size: 15px !important;
+    }
+
+    .cockpit-hero-row.state-4 .card-metric-hero {
+        font-size: 16px !important;
+    }
+
+    .hero-unit {
+        font-size: 10.5px !important;
+    }
+
+    .cockpit-actions {
+        gap: 4px !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .btn-action-play {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 12px !important;
+    }
+
+    .btn-action-pill {
+        padding: 5px 8px !important;
+        font-size: 9.5px !important;
+    }
+
+    .btn-action-icon {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 12px !important;
+    }
+
+    /* Drawer */
+    .cockpit-drawer {
+        padding: 6px 8px 8px !important;
+        gap: 6px !important;
+    }
+
+    .timeline-container {
+        width: 100% !important;
+        gap: 6px !important;
+    }
+
+    .timeline-slider {
+        height: 5px !important;
+    }
+
+    .time-readout {
+        font-size: 10px !important;
+    }
+
+    .drawer-controls-row {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 4px !important;
     }
 
     .btn-speed {
-        padding: 7px 8px !important;
-        font-size: 11px !important;
+        padding: 4px 6px !important;
+        font-size: 10px !important;
     }
 
     .btn-locate {
-        order: 4 !important;
-        flex: 1 1 calc(50% - 4px) !important;
-        text-align: center;
-        padding: 10px 8px !important;
-        font-size: 11px !important;
-        font-weight: 700;
+        padding: 5px 8px !important;
+        font-size: 10px !important;
     }
 
-    .btn-benchmark {
-        order: 5 !important;
-        flex: 1 1 calc(50% - 4px) !important;
-        text-align: center;
-        padding: 10px 8px !important;
-        font-size: 11px !important;
-        font-weight: 700;
-    }
-
-    .btn-phone {
-        order: 6 !important;
-        flex: 1 1 calc(50% - 4px) !important;
-        text-align: center;
-        padding: 10px 8px !important;
-        font-size: 11px !important;
-        font-weight: 700;
-    }
-
-    .btn-danger {
-        order: 7 !important;
-        flex: 1 1 calc(50% - 4px) !important;
-        text-align: center;
-        padding: 10px 8px !important;
-        font-size: 11px !important;
-        font-weight: 700;
-    }
-
-    /* Telemetry Panel */
+    /* Telemetry Panel (in Engineer HUD) */
     .telemetry-panel {
         overflow-y: visible !important;
         gap: 10px !important;
@@ -1941,27 +2083,26 @@ body.in-fullscreen-map .telemetry-panel {
 
 @media (max-width: 480px) {
     .brand-title-row {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         gap: 4px;
     }
 
-    .sih-tag, .tag-edge {
-        font-size: 8.5px;
-        padding: 2px 5px;
-    }
-
-    .map-section {
-        height: 70vh !important;
-        min-height: 500px !important;
+    .sih-tag {
+        font-size: 8px;
+        padding: 2px 4px;
     }
 
     body.driver-mode .map-section {
-        height: 74vh !important;
-        min-height: 530px !important;
+        flex: 1 1 auto !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        max-height: none !important;
     }
 
-    .map-viewport {
-        min-height: 420px !important;
+    body.driver-mode .map-viewport {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        height: 100% !important;
     }
 
     .modal-card {
