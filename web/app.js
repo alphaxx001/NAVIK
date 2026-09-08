@@ -262,6 +262,22 @@ class NavikDashboard {
                 this.startSimulatedPhoneSensors();
             });
         }
+        // Fullscreen / Expand Map Toggle
+        const btnExpand = document.getElementById('btnExpandMap');
+        if (btnExpand) {
+            btnExpand.addEventListener('click', () => {
+                const mapSection = document.querySelector('.map-section');
+                mapSection.classList.toggle('fullscreen-map');
+                const isFull = mapSection.classList.contains('fullscreen-map');
+                btnExpand.innerHTML = isFull ? '✕ Exit' : '⛶ Fullscreen';
+                btnExpand.classList.toggle('active', isFull);
+                [50, 150, 300, 600].forEach(ms => {
+                    setTimeout(() => {
+                        if (this.map) this.map.invalidateSize();
+                    }, ms);
+                });
+            });
+        }
 
         // Mode View Switcher (Driver Mode vs Engineer HUD)
         if (this.dom.btnDriverView && this.dom.btnEngineerView) {
