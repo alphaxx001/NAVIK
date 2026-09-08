@@ -1,0 +1,18 @@
+# Ignore Python files so Vercel does not attempt to build Python serverless functions
+requirements.txt
+*.py
+
+# Ignore non-web directories to speed up deployment
+data/
+ml/
+Edge_Engine/
+libnavik/
+map/
+models/
+scripts/
+tests/
+outputs/
+docs/
+AI_Model/
+Mobile_App/
+CMakeLists.txt
