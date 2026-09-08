@@ -524,19 +524,71 @@ class NavikDashboard {
             this.dom.btnLocateMe.innerText = '📍 My Location';
         }
 
+        // Reset manual outage if active
+        if (this.manualOutage) {
+            this.manualOutage = false;
+            if (this.dom.toggleOutageBtn) {
+                this.dom.toggleOutageBtn.innerText = 'Inject Outage';
+                this.dom.toggleOutageBtn.style.background = 'rgba(239, 68, 68, 0.15)';
+                this.dom.toggleOutageBtn.style.color = '#ef4444';
+            }
+        }
+        if (this.dom.blackoutBanner) {
+            this.dom.blackoutBanner.classList.add('hidden');
+        }
+
         if (this.dom.locationTagText) {
             this.dom.locationTagText.innerText = '🚗 Demo Replay: Coventry Benchmark (UK)';
         }
 
-        // Smoothly fly camera back to UK benchmark route, reset vehicle marker, and resume replay
+        if (this.dom.storyDesc) {
+            this.dom.storyDesc.innerHTML = '<strong>Coventry Benchmark Replay</strong> active. Driving along test route under normal GPS conditions.';
+        }
+
+        // Button click visual feedback
+        const btnBenchmark = document.getElementById('btnBenchmarkRoute');
+        if (btnBenchmark) {
+            btnBenchmark.innerText = '🚗 Benchmark Active!';
+            btnBenchmark.classList.add('active');
+            setTimeout(() => {
+                const btn = document.getElementById('btnBenchmarkRoute');
+                if (btn) {
+                    btn.innerText = '🚗 Benchmark Route';
+                    btn.classList.remove('active');
+                }
+            }, 1200);
+        }
+
+        // Reset replay timeline to start if at or near end so user immediately sees vehicle moving
         if (this.data && this.data.frames && this.data.frames.length > 0) {
-            const frame = this.data.frames[this.currentIndex || 0];
+            if (!this.currentIndex || this.currentIndex >= this.data.frames.length - 20) {
+                this.currentIndex = 0;
+            }
+            if (this.dom.timelineSlider) {
+                this.dom.timelineSlider.value = this.currentIndex;
+            }
+
+            const frame = this.data.frames[this.currentIndex];
             const targetPos = frame.mode === 'GNSS' ? frame.gt.slice(0, 2) : frame.fused;
-            this.vehicleMarker.setLatLng(targetPos);
-            this.map.flyTo(targetPos, 16, { duration: 1.5 });
-            this.renderFrame(this.currentIndex || 0);
+
+            if (this.vehicleMarker) {
+                this.vehicleMarker.setLatLng(targetPos);
+            }
+
+            // Using setView guarantees instant, error-free camera snap back to Coventry UK
+            if (this.map) {
+                this.map.setView(targetPos, 16);
+                setTimeout(() => {
+                    if (this.map) this.map.invalidateSize();
+                }, 100);
+            }
+
+            this.renderFrame(this.currentIndex);
             this.isPlaying = true;
             if (this.dom.playIcon) this.dom.playIcon.innerText = '❚❚';
+        } else if (this.map) {
+            // Fallback default coordinates for Coventry, UK
+            this.map.setView([52.5618, -1.4552], 16);
         }
     }
 

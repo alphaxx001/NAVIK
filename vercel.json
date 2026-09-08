@@ -3,5 +3,16 @@
   "cleanUrls": true,
   "framework": null,
   "buildCommand": null,
-  "outputDirectory": "web"
+  "outputDirectory": "web",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ]
 }

@@ -194,7 +194,7 @@
                     </div>
 
                     <button class="btn btn-locate" id="btnLocateMe" title="Center map on your real current GPS location">📍 My Location</button>
-                    <button class="btn btn-benchmark" id="btnBenchmarkRoute" title="Return to Benchmark Replay (UK)">🚗 Benchmark Route</button>
+                    <button class="btn btn-benchmark" id="btnBenchmarkRoute" onclick="if(window.dashboard)window.dashboard.flyToBenchmark()" title="Return to Benchmark Replay (UK)">🚗 Benchmark Route</button>
                     <button class="btn btn-phone" id="phoneModeBtn" title="Stream live Smartphone IMU & GPS">📱 Live Sensors</button>
                     <button class="btn btn-danger" id="toggleOutageBtn">Inject Outage</button>
                 </div>
@@ -332,6 +332,6 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="app.js"></script>
+    <script src="app.js?v=2.2"></script>
 </body>
 </html>
