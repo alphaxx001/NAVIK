@@ -11,10 +11,27 @@ from ml.data.io_vnbd_schema import IOVNBDSchemaResolver
 def run_replay(session_id="Vta1a"):
     print(f"--- EDGE ENGINE REPLAY: {session_id} ---")
     
-    inventory = pd.read_csv("data/manifests/session_inventory.csv")
-    row = inventory[inventory['session_id'] == session_id].iloc[0]
-    df_imu = pd.read_csv(row['s_file'], encoding='latin1', on_bad_lines='skip')
-    df_v = pd.read_csv(row['v_file'], encoding='latin1', on_bad_lines='skip')
+    demo_file = "data/demo/replay_session.csv"
+    use_demo = False
+    
+    if os.path.exists("data/manifests/session_inventory.csv"):
+        inventory = pd.read_csv("data/manifests/session_inventory.csv")
+        rows = inventory[inventory['session_id'] == session_id]
+        if len(rows) > 0 and os.path.exists(rows.iloc[0]['s_file']):
+            row = rows.iloc[0]
+            df_imu = pd.read_csv(row['s_file'], encoding='latin1', on_bad_lines='skip')
+            df_v = pd.read_csv(row['v_file'], encoding='latin1', on_bad_lines='skip')
+        else:
+            use_demo = True
+    else:
+        use_demo = True
+
+    if use_demo:
+        if not os.path.exists(demo_file):
+            raise FileNotFoundError(f"Neither raw session '{session_id}' nor demo file '{demo_file}' found.")
+        print(f"Using demo replay session: {demo_file}")
+        df_imu = pd.read_csv(demo_file)
+        df_v = df_imu
     
     imu_schema = IOVNBDSchemaResolver.resolve_imu_columns(df_imu)
     v_schema = IOVNBDSchemaResolver.resolve_v_columns(df_v)
@@ -23,17 +40,24 @@ def run_replay(session_id="Vta1a"):
     lon = df_v[v_schema['lon']].values
     head = df_v[v_schema['heading']].values
     
-    t_ms = df_imu[imu_schema['time']].values
-    gx = df_imu[imu_schema['gyro_x']].values; gy = df_imu[imu_schema['gyro_y']].values; gz = df_imu[imu_schema['gyro_z']].values
-    ax = df_imu[imu_schema['accel_x']].values; ay = df_imu[imu_schema['accel_y']].values; az = df_imu[imu_schema['accel_z']].values
+    t_val = df_imu[imu_schema['time']].values.astype(float)
+    gx = df_imu[imu_schema['gyro_x']].values.astype(float)
+    gy = df_imu[imu_schema['gyro_y']].values.astype(float)
+    gz = df_imu[imu_schema['gyro_z']].values.astype(float)
+    ax = df_imu[imu_schema['accel_x']].values.astype(float)
+    ay = df_imu[imu_schema['accel_y']].values.astype(float)
+    az = df_imu[imu_schema['accel_z']].values.astype(float)
     
-    g_m = np.pi/180.0 if 'deg' in imu_schema['gyro_x'].lower() else 1.0
-    a_m = 9.81 if '(g)' in imu_schema['accel_x'].lower() else 1.0
+    g_m = np.pi/180.0 if 'deg' in str(imu_schema['gyro_x']).lower() else 1.0
+    a_m = 9.81 if '(g)' in str(imu_schema['accel_x']).lower() else 1.0
     
     gyro = np.stack([gx, gy, gz], axis=1) * g_m
     accel = np.stack([ax, ay, az], axis=1) * a_m
     
-    t_imu = t_ms / 1000.0
+    if np.nanmax(t_val) > 100000:
+        t_imu = t_val / 1000.0
+    else:
+        t_imu = t_val
     
     engine = EdgeEngine(f"map/runtime/{session_id}_graph.json")
     

@@ -38,3 +38,15 @@ eigen.zip
 # OS generated
 .DS_Store
 Thumbs.db
+
+# Deployment artifacts
+.vercel
+.netlify
+
+# Local SSL certificates
+web/cert.pem
+web/key.pem
+
+# Runtime test outputs
+outputs/
+tests/test_outputs/

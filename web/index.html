@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NAVIK — Intelligent Dead Reckoning Navigation Dashboard</title>
+    <meta name="description" content="AI-ML based Intelligent Dead Reckoning system for seamless navigation in GNSS-denied environments (SIH 26168).">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body class="driver-mode">
+    <div class="app-container">
+        <!-- Top Navigation Bar -->
+        <header class="top-nav">
+            <div class="brand-group">
+                <div class="logo-badge">
+                    <span class="logo-icon">🧭</span>
+                </div>
+                <div class="brand-text">
+                    <div class="brand-title-row">
+                        <h1 class="brand-name">NAVIK</h1>
+                        <span class="sih-tag">SIH 26168</span>
+                        <span class="tag-edge">EDGE RUNTIME</span>
+                    </div>
+                    <p class="brand-subtitle">Navigation Assurance in GNSS-denied Indian Kinematics</p>
+                </div>
+            </div>
+
+            <!-- Mode View Switcher: Driver (Simple) vs Engineer (Detailed) -->
+            <div class="view-toggle-group">
+                <button class="btn-view-toggle active" id="btnDriverView">🚗 Driver Mode</button>
+                <button class="btn-view-toggle" id="btnEngineerView">🔬 Engineer HUD</button>
+            </div>
+
+            <!-- Global Mode & Status Badges -->
+            <div class="status-cluster">
+                <div class="status-card" id="modeCard">
+                    <span class="status-label">NAVIGATION MODE</span>
+                    <div class="status-value-group">
+                        <span class="status-dot" id="modeDot"></span>
+                        <span class="status-value" id="modeValue">INITIALIZING</span>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <span class="status-label">GNSS SIGNAL</span>
+                    <div class="status-value-group">
+                        <span class="gnss-signal-bar active"></span>
+                        <span class="gnss-signal-bar active"></span>
+                        <span class="gnss-signal-bar active"></span>
+                        <span class="gnss-signal-bar" id="gnssBar4"></span>
+                        <span class="status-sub" id="gnssStatusText">LOCKED</span>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <span class="status-label">HMM ROAD SNAPPING</span>
+                    <div class="status-value-group">
+                        <span class="metric-pill" id="mapStatusPill">100% CONFIDENCE</span>
+                    </div>
+                </div>
+
+                <div class="status-card" id="sensorTelemetryCard">
+                    <span class="status-label">PHONE SENSORS</span>
+                    <div class="status-value-group">
+                        <span class="sensor-readout" id="sensorLiveReadout">STANDBY</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Insecure Context / HTTPS Sensor Modal -->
+        <div class="modal-overlay hidden" id="sensorModal">
+            <div class="modal-card glass-panel">
+                <div class="modal-title-row">
+                    <span class="modal-icon">🔒</span>
+                    <h3 class="modal-title">Enable Smartphone Sensors</h3>
+                </div>
+                <p class="modal-text">
+                    Mobile browsers (Chrome & Safari) strictly block Accelerometer, Gyroscope, and GPS access over insecure <code>http://</code>. Choose an option below:
+                </p>
+                <div class="modal-options">
+                    <div class="modal-option-box">
+                        <div class="option-header">
+                            <span class="option-badge">REAL HARDWARE</span>
+                            <strong>Option 1: Switch to Hotspot HTTPS (8443)</strong>
+                        </div>
+                        <p class="option-desc">Tap the button below. When your phone warns about a self-signed certificate, tap <em>Advanced &rarr; Proceed to 192.168.137.1</em> to grant sensor access.</p>
+                        <a href="https://192.168.137.1:8443" class="btn btn-modal-primary">🚀 Open https://192.168.137.1:8443</a>
+                    </div>
+                    <div class="modal-option-box">
+                        <div class="option-header">
+                            <span class="option-badge option-badge-alt">ZERO CONFIG</span>
+                            <strong>Option 2: Live Sensor Emulation</strong>
+                        </div>
+                        <p class="option-desc">Stay right here on HTTP! Synthesizes realistic 100Hz IMU vibrations, steering gyro, and live driving dead-reckoning directly on your phone.</p>
+                        <button class="btn btn-modal-secondary" id="btnSimulateSensors">🎮 Drive in Sensor Emulation Mode</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-ghost" id="btnCloseModal">Dismiss</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Layout -->
+        <main class="dashboard-grid">
+            <!-- Left Panel: Interactive Map Viewport -->
+            <section class="map-section glass-panel">
+                <div class="panel-header">
+                    <div class="header-left">
+                        <span class="panel-icon">🗺️</span>
+                        <h2 class="panel-title">Geospatial Trajectory & Road Snapping</h2>
+                    </div>
+                    <div class="map-legend">
+                        <div class="legend-item"><span class="legend-color legend-gt"></span> Ground Truth (GNSS)</div>
+                        <div class="legend-item"><span class="legend-color legend-fused"></span> NAVIK AI-Fused + Map</div>
+                        <div class="legend-item"><span class="legend-color legend-dr"></span> Raw IMU Drift (Baseline)</div>
+                        <div class="legend-item"><span class="legend-color legend-road"></span> OSM Road Geometry</div>
+                    </div>
+                </div>
+
+                <div id="map" class="map-viewport"></div>
+
+                <!-- Floating Map Location Tag -->
+                <div class="map-location-tag" id="mapLocationTag">
+                    <span class="location-dot"></span>
+                    <span id="locationTagText">🚗 Demo Replay: Coventry Benchmark (UK)</span>
+                </div>
+
+                <!-- Floating Map Overlay Banner -->
+                <div class="map-blackout-banner hidden" id="blackoutBanner">
+                    <div class="banner-pulse"></div>
+                    <span class="banner-icon">⚠️</span>
+                    <div class="banner-text">
+                        <strong>GNSS OUTAGE IN PROGRESS</strong>
+                        <span>Error-State Kalman Filter & SpeedNet Dead-Reckoning Active</span>
+                    </div>
+                </div>
+
+                <!-- Map Controls Footer -->
+                <div class="playback-bar">
+                    <button class="btn btn-icon" id="playBtn" title="Play / Pause">
+                        <span id="playIcon">▶</span>
+                    </button>
+                    <button class="btn btn-icon" id="resetBtn" title="Reset Timeline">↺</button>
+                    
+                    <div class="timeline-container">
+                        <input type="range" class="timeline-slider" id="timelineSlider" min="0" max="100" value="0" step="1">
+                        <div class="time-readout">
+                            <span id="timeElapsed">00:00.0</span> / <span id="timeTotal">05:00.0</span>
+                        </div>
+                    </div>
+
+                    <div class="speed-selector">
+                        <button class="btn-speed active" data-speed="1">1x</button>
+                        <button class="btn-speed" data-speed="2">2x</button>
+                        <button class="btn-speed" data-speed="5">5x</button>
+                        <button class="btn-speed" data-speed="10">10x</button>
+                    </div>
+
+                    <button class="btn btn-locate" id="btnLocateMe" title="Center map on your real current GPS location">📍 My Location</button>
+                    <button class="btn btn-phone" id="phoneModeBtn" title="Stream live Smartphone IMU & GPS">📱 Live Sensors</button>
+                    <button class="btn btn-danger" id="toggleOutageBtn">Inject Outage</button>
+                </div>
+            </section>
+
+            <!-- Right Panel: Telemetry & AI Model Insights -->
+            <aside class="telemetry-panel">
+                <!-- Simple Driver Explanation Card -->
+                <div class="glass-panel driver-story-card" id="driverStoryCard">
+                    <div class="story-header">
+                        <span class="story-badge" id="storyBadge">🟢 GPS LOCKED</span>
+                        <span class="story-mode-label" id="storyModeLabel">Normal Road Driving</span>
+                    </div>
+                    <p class="story-desc" id="storyDesc">
+                        Driving under clear sky with GPS satellites active. Tap <strong>"Inject Outage"</strong> to simulate what happens when you drive into a tunnel or basement!
+                    </p>
+                    <div class="story-note">
+                        <span class="note-icon">💡</span>
+                        <span><strong>Tip:</strong> NAVIK uses phone sensors for <em>vehicles on roads</em>. Indoors/walking has no road graph & causes GPS signal bounce.</span>
+                    </div>
+                </div>
+
+                <!-- Kinematic Gauges Card -->
+                <div class="glass-panel gauge-card">
+                    <div class="panel-header">
+                        <span class="panel-icon">⚡</span>
+                        <h2 class="panel-title">Kinematic Estimators</h2>
+                    </div>
+                    <div class="gauges-row">
+                        <!-- Speedometer -->
+                        <div class="gauge-box">
+                            <div class="gauge-ring">
+                                <svg viewBox="0 0 120 120" class="gauge-svg">
+                                    <circle class="gauge-bg" cx="60" cy="60" r="50" />
+                                    <circle class="gauge-fill" id="speedGaugeCircle" cx="60" cy="60" r="50" />
+                                </svg>
+                                <div class="gauge-value-display">
+                                    <span class="gauge-num" id="speedValue">0.0</span>
+                                    <span class="gauge-unit">km/h</span>
+                                </div>
+                            </div>
+                            <div class="gauge-label">SpeedNet Speed</div>
+                        </div>
+
+                        <!-- Stationary Probability (ZUPT) -->
+                        <div class="gauge-box">
+                            <div class="meter-container">
+                                <div class="meter-bar-track">
+                                    <div class="meter-bar-fill" id="zuptMeterFill"></div>
+                                </div>
+                                <div class="meter-threshold-line" title="ZUPT Threshold 0.569"></div>
+                            </div>
+                            <div class="meter-readout">
+                                <span class="meter-state" id="zuptState">MOVING</span>
+                                <span class="meter-val" id="zuptProb">0.02 P</span>
+                            </div>
+                            <div class="gauge-label">MotionStateNet (ZUPT)</div>
+                        </div>
+
+                        <!-- Heading / Yaw Compass -->
+                        <div class="gauge-box">
+                            <div class="compass-dial" id="compassDial">
+                                <div class="compass-arrow"></div>
+                                <div class="compass-marker n">N</div>
+                                <div class="compass-marker s">S</div>
+                            </div>
+                            <div class="compass-readout" id="headingReadout">017°</div>
+                            <div class="gauge-label">HeadingNet Yaw</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Health & Accuracy HUD -->
+                <div class="glass-panel metrics-card">
+                    <div class="panel-header">
+                        <span class="panel-icon">📊</span>
+                        <h2 class="panel-title">Filter Health & Metrics</h2>
+                    </div>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <span class="metric-label">Cross-Track Error</span>
+                            <span class="metric-val" id="errorVal">0.42 m</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Cumulative Drift</span>
+                            <span class="metric-val text-green" id="driftVal">0.8 %</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">KD-Tree Query Time</span>
+                            <span class="metric-val text-cyan">0.38 ms</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Neural Latency</span>
+                            <span class="metric-val text-cyan">1.13 ms</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Oscilloscope IMU Waveforms -->
+                <div class="glass-panel waveforms-card">
+                    <div class="panel-header">
+                        <span class="panel-icon">📈</span>
+                        <h2 class="panel-title">Live 6-Axis IMU Stream (100 Hz)</h2>
+                    </div>
+                    <div class="waveform-group">
+                        <div class="waveform-header">
+                            <span class="axis-legend x">Ax</span>
+                            <span class="axis-legend y">Ay</span>
+                            <span class="axis-legend z">Az (m/s²)</span>
+                        </div>
+                        <canvas id="accelCanvas" class="waveform-canvas" width="400" height="75"></canvas>
+                    </div>
+                    <div class="waveform-group">
+                        <div class="waveform-header">
+                            <span class="axis-legend x">Gx</span>
+                            <span class="axis-legend y">Gy</span>
+                            <span class="axis-legend z">Gz (rad/s)</span>
+                        </div>
+                        <canvas id="gyroCanvas" class="waveform-canvas" width="400" height="75"></canvas>
+                    </div>
+                </div>
+
+                <!-- Architecture & Verification Card -->
+                <div class="glass-panel tech-card">
+                    <div class="tech-header">
+                        <span class="tech-title">LOOSELY-COUPLED ESKF + OPEN-LOOP HMM</span>
+                    </div>
+                    <p class="tech-desc">
+                        Decoupled map snapping protects the continuous 15-state inertial filter from topological divergence. Verified across 12 benchmark test runs.
+                    </p>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="app.js"></script>
+</body>
+</html>

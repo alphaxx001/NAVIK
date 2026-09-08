@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import torch
 import numpy as np
@@ -6,7 +7,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 from scipy.spatial.transform import Rotation as R
-import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from ml.models.speednet.speednet import SpeedNet
 from ml.models.motion_state.motion_state_net import MotionStateNet
@@ -15,6 +17,7 @@ from libnavik.python_reference.eskf import ESKF
 from libnavik.python_reference.evaluate_baseline import latlon_to_enu
 from ml.data.dataset_loader import IOVNBDProductionDataset
 from ml.data.io_vnbd_schema import IOVNBDSchemaResolver
+from scripts.test_kdtree_equivalence import KDTreeHMMMapMatcher
 
 def enu_to_latlon(e, n, lat0, lon0):
     R = 6378137.0
@@ -23,35 +26,56 @@ def enu_to_latlon(e, n, lat0, lon0):
     lon = lon0 + np.degrees(e / (R * np.cos(lat0_rad)))
     return lat, lon
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from scripts.test_kdtree_equivalence import KDTreeHMMMapMatcher
+try:
+    import onnxruntime as ort
+    HAS_ORT = True
+except ImportError:
+    HAS_ORT = False
 
 def load_models(device):
     s_cfg = json.load(open("configs/speednet_training.json"))
     m_cfg = json.load(open("configs/motion_state_training.json"))
     h_cfg = json.load(open("configs/heading_training.json"))
     
-    speednet = SpeedNet(s_cfg['model']['in_channels'], s_cfg['model']['cnn_channels'], s_cfg['model']['kernel_size'], s_cfg['model']['gru_hidden'], s_cfg['model']['gru_layers'])
-    speednet.load_state_dict(torch.load(s_cfg['paths']['best_model'], map_location=device, weights_only=True)); speednet.eval()
-    
-    motionnet = MotionStateNet(m_cfg['model']['in_channels'], m_cfg['model']['cnn_channels'], m_cfg['model']['kernel_size'], m_cfg['model']['gru_hidden'], m_cfg['model']['gru_layers'])
-    motionnet.load_state_dict(torch.load(m_cfg['paths']['best_model'], map_location=device, weights_only=True)); motionnet.eval()
-    
-    headingnet = HeadingNet(h_cfg['model']['in_channels'], h_cfg['model']['cnn_channels'], h_cfg['model']['kernel_size'], h_cfg['model']['gru_hidden'], h_cfg['model']['gru_layers'])
-    headingnet.load_state_dict(torch.load(h_cfg['paths']['best_model'], map_location=device, weights_only=True)); headingnet.eval()
-    
-    return speednet, motionnet, headingnet
+    speed_pth = s_cfg['paths']['best_model']
+    speed_onnx = "models/onnx/SpeedNet.onnx"
+    motion_onnx = "models/onnx/MotionStateNet.onnx"
+    heading_onnx = "models/onnx/HeadingNet.onnx"
+
+    if os.path.exists(speed_pth):
+        speednet = SpeedNet(s_cfg['model']['in_channels'], s_cfg['model']['cnn_channels'], s_cfg['model']['kernel_size'], s_cfg['model']['gru_hidden'], s_cfg['model']['gru_layers'])
+        speednet.load_state_dict(torch.load(speed_pth, map_location=device, weights_only=True)); speednet.eval()
+        
+        motionnet = MotionStateNet(m_cfg['model']['in_channels'], m_cfg['model']['cnn_channels'], m_cfg['model']['kernel_size'], m_cfg['model']['gru_hidden'], m_cfg['model']['gru_layers'])
+        motionnet.load_state_dict(torch.load(m_cfg['paths']['best_model'], map_location=device, weights_only=True)); motionnet.eval()
+        
+        headingnet = HeadingNet(h_cfg['model']['in_channels'], h_cfg['model']['cnn_channels'], h_cfg['model']['kernel_size'], h_cfg['model']['gru_hidden'], h_cfg['model']['gru_layers'])
+        headingnet.load_state_dict(torch.load(h_cfg['paths']['best_model'], map_location=device, weights_only=True)); headingnet.eval()
+        return speednet, motionnet, headingnet
+    elif HAS_ORT and os.path.exists(speed_onnx):
+        opts = ort.SessionOptions()
+        opts.intra_op_num_threads = 2
+        speednet = ort.InferenceSession(speed_onnx, sess_options=opts)
+        motionnet = ort.InferenceSession(motion_onnx, sess_options=opts)
+        headingnet = ort.InferenceSession(heading_onnx, sess_options=opts)
+        return speednet, motionnet, headingnet
+    else:
+        raise FileNotFoundError(f"Neither PyTorch checkpoints ({speed_pth}) nor ONNX models ({speed_onnx}) found.")
 
 def extract_windows(df_imu, imu_schema, window_size=20):
-    gx = df_imu[imu_schema['gyro_x']].values; gy = df_imu[imu_schema['gyro_y']].values; gz = df_imu[imu_schema['gyro_z']].values
-    ax = df_imu[imu_schema['accel_x']].values; ay = df_imu[imu_schema['accel_y']].values; az = df_imu[imu_schema['accel_z']].values
+    gx = df_imu[imu_schema['gyro_x']].values.astype(float); gy = df_imu[imu_schema['gyro_y']].values.astype(float); gz = df_imu[imu_schema['gyro_z']].values.astype(float)
+    ax = df_imu[imu_schema['accel_x']].values.astype(float); ay = df_imu[imu_schema['accel_y']].values.astype(float); az = df_imu[imu_schema['accel_z']].values.astype(float)
     
-    g_m = np.pi/180.0 if 'deg' in imu_schema['gyro_x'].lower() else 1.0
-    a_m = 9.81 if '(g)' in imu_schema['accel_x'].lower() else 1.0
+    g_m = np.pi/180.0 if 'deg' in str(imu_schema['gyro_x']).lower() else 1.0
+    a_m = 9.81 if '(g)' in str(imu_schema['accel_x']).lower() else 1.0
     
     gyro = np.stack([gx, gy, gz], axis=1) * g_m
     accel = np.stack([ax, ay, az], axis=1) * a_m
-    t_ms = df_imu[imu_schema['time']].values
+    t_val = df_imu[imu_schema['time']].values.astype(float)
+    if np.nanmax(t_val) < 100000:
+        t_ms = t_val * 1000.0
+    else:
+        t_ms = t_val
     
     # Standard scaling constants from Phase 2
     mu_a = np.array([-0.0528,  0.4284,  9.7424]); std_a = np.array([1.2335, 1.4878, 1.4429])
@@ -73,13 +97,23 @@ def infer_networks(inputs, speednet, motionnet, headingnet, device):
     bs = 1024
     p_speed = []; p_motion = []; p_heading = []
     
-    with torch.no_grad():
-        for i in range(0, len(inputs), bs):
-            batch = torch.tensor(inputs[i:i+bs]).to(device)
-            s = speednet(batch).cpu().numpy()
-            m = motionnet(batch).cpu().numpy()
-            h = headingnet(batch).cpu().numpy()
+    is_ort = hasattr(speednet, 'run')
+    
+    if is_ort:
+        for i in range(len(inputs)):
+            inp = np.expand_dims(inputs[i].astype(np.float32), axis=0)
+            s = speednet.run(None, {'input': inp})[0]
+            m = motionnet.run(None, {'input': inp})[0]
+            h = headingnet.run(None, {'input': inp})[0]
             p_speed.append(s); p_motion.append(m); p_heading.append(h)
+    else:
+        with torch.no_grad():
+            for i in range(0, len(inputs), bs):
+                batch = torch.tensor(inputs[i:i+bs]).to(device)
+                s = speednet(batch).cpu().numpy()
+                m = motionnet(batch).cpu().numpy()
+                h = headingnet(batch).cpu().numpy()
+                p_speed.append(s); p_motion.append(m); p_heading.append(h)
             
     p_speed = np.concatenate(p_speed).squeeze()
     p_motion = np.concatenate(p_motion).squeeze()
@@ -101,18 +135,35 @@ def run_pipeline(session_id="Vta1a", output_dir="outputs"):
     device = torch.device("cpu")
     
     # 1. Load Data
-    inventory = pd.read_csv("data/manifests/session_inventory.csv")
-    row = inventory[inventory['session_id'] == session_id].iloc[0]
-    df_imu = pd.read_csv(row['s_file'], encoding='latin1', on_bad_lines='skip')
-    df_v = pd.read_csv(row['v_file'], encoding='latin1', on_bad_lines='skip')
+    demo_file = "data/demo/replay_session.csv"
+    use_demo = False
+    
+    if os.path.exists("data/manifests/session_inventory.csv"):
+        inventory = pd.read_csv("data/manifests/session_inventory.csv")
+        rows = inventory[inventory['session_id'] == session_id]
+        if len(rows) > 0 and os.path.exists(rows.iloc[0]['s_file']):
+            row = rows.iloc[0]
+            df_imu = pd.read_csv(row['s_file'], encoding='latin1', on_bad_lines='skip')
+            df_v = pd.read_csv(row['v_file'], encoding='latin1', on_bad_lines='skip')
+        else:
+            use_demo = True
+    else:
+        use_demo = True
+        
+    if use_demo:
+        if not os.path.exists(demo_file):
+            raise FileNotFoundError(f"Neither raw session '{session_id}' nor demo file '{demo_file}' found.")
+        print(f"Using demo replay session: {demo_file}")
+        df_imu = pd.read_csv(demo_file)
+        df_v = df_imu
     
     imu_schema = IOVNBDSchemaResolver.resolve_imu_columns(df_imu)
     v_schema = IOVNBDSchemaResolver.resolve_v_columns(df_v)
     
-    lat = df_v[v_schema['lat']].values
-    lon = df_v[v_schema['lon']].values
-    head = df_v[v_schema['heading']].values
-    t_v = df_v[v_schema['time']].values
+    lat = df_v[v_schema['lat']].values.astype(float)
+    lon = df_v[v_schema['lon']].values.astype(float)
+    head = df_v[v_schema['heading']].values.astype(float)
+    t_v = df_v[v_schema['time']].values.astype(float)
     
     # 2. Neural Inference
     speednet, motionnet, headingnet = load_models(device)

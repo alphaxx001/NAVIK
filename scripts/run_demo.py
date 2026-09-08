@@ -29,19 +29,36 @@ def generate_demo_outputs(session_id="Vta1a"):
     device = torch.device("cpu")
     
     # 1. Load Data
-    inventory = pd.read_csv("data/manifests/session_inventory.csv")
-    row = inventory[inventory['session_id'] == session_id].iloc[0]
-    df_imu = pd.read_csv(row['s_file'], encoding='latin1', on_bad_lines='skip')
-    df_v = pd.read_csv(row['v_file'], encoding='latin1', on_bad_lines='skip')
+    demo_file = "data/demo/replay_session.csv"
+    use_demo = False
+    
+    if os.path.exists("data/manifests/session_inventory.csv"):
+        inventory = pd.read_csv("data/manifests/session_inventory.csv")
+        rows = inventory[inventory['session_id'] == session_id]
+        if len(rows) > 0 and os.path.exists(rows.iloc[0]['s_file']):
+            row = rows.iloc[0]
+            df_imu = pd.read_csv(row['s_file'], encoding='latin1', on_bad_lines='skip')
+            df_v = pd.read_csv(row['v_file'], encoding='latin1', on_bad_lines='skip')
+        else:
+            use_demo = True
+    else:
+        use_demo = True
+
+    if use_demo:
+        if not os.path.exists(demo_file):
+            raise FileNotFoundError(f"Neither raw session '{session_id}' nor demo file '{demo_file}' found.")
+        print(f"Using demo replay session: {demo_file}")
+        df_imu = pd.read_csv(demo_file)
+        df_v = df_imu
     
     imu_schema = IOVNBDSchemaResolver.resolve_imu_columns(df_imu)
     v_schema = IOVNBDSchemaResolver.resolve_v_columns(df_v)
     
-    lat = df_v[v_schema['lat']].values
-    lon = df_v[v_schema['lon']].values
-    head = df_v[v_schema['heading']].values
-    vel_gt = df_v[v_schema['speed']].values if 'speed' in v_schema else df_v[v_schema['velocity']].values
-    t_v = df_v[v_schema['time']].values
+    lat = df_v[v_schema['lat']].values.astype(float)
+    lon = df_v[v_schema['lon']].values.astype(float)
+    head = df_v[v_schema['heading']].values.astype(float)
+    vel_gt = df_v[v_schema['velocity']].values.astype(float) if v_schema['velocity'] in df_v else np.zeros(len(df_v))
+    t_v = df_v[v_schema['time']].values.astype(float)
     
     # Align clocks
     t_v_rel = t_v - t_v[0]
@@ -64,13 +81,17 @@ def generate_demo_outputs(session_id="Vta1a"):
     timestamps = np.zeros(len(p_speed))
     
     # Define GNSS Outage Bounds
-    # Total duration of Vta1a is ~2500s. Blackout: [500, 2000]
-    blackout_start = 500.0
-    blackout_end = 2000.0
+    total_dur = t_v_rel[-1] if len(t_v_rel) > 0 else 300.0
+    if total_dur > 1000:
+        blackout_start = 500.0
+        blackout_end = 2000.0
+    else:
+        blackout_start = 30.0
+        blackout_end = min(240.0, total_dur * 0.8)
     
-    print("Propagating Authoritative Inertial State...")
+    print(f"Propagating Authoritative Inertial State (Blackout: {blackout_start}s to {blackout_end}s)...")
     for i in range(1, len(p_speed)):
-        idx = i + 199
+        idx = i + 19
         if idx >= len(t_ms): break
         dt = t_imu[idx] - t_imu[idx-1]
         if dt <= 0: dt = 0.01
