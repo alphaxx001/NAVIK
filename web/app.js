@@ -71,8 +71,33 @@ class NavikDashboard {
             
             // Location Tracking Elements
             btnLocateMe: document.getElementById('btnLocateMe'),
-            locationTagText: document.getElementById('locationTagText')
+            locationTagText: document.getElementById('locationTagText'),
+
+            // GNSS Blackout Flow UI Elements (SIH 26168 Sequential 4-State UI)
+            flowOverlay: document.getElementById('gnssFlowOverlay'),
+            flowStepBtns: document.querySelectorAll('.btn-flow-step'),
+            flowStatusPill: document.getElementById('flowStatusPill'),
+            flowPillIcon: document.getElementById('flowPillIcon'),
+            flowPillText: document.getElementById('flowPillText'),
+            flowSlideBanner: document.getElementById('flowSlideBanner'),
+            flowConfidenceBadge: document.getElementById('flowConfidenceBadge'),
+            flowConfNum: document.getElementById('flowConfNum'),
+            flowBottomCard: document.getElementById('flowBottomCard'),
+            flowCardLabel: document.getElementById('flowCardLabel'),
+            flowCardHero: document.getElementById('flowCardHero'),
+            flowHeroNum: document.getElementById('flowHeroNum'),
+            flowHeroUnit: document.getElementById('flowHeroUnit')
         };
+
+        // Sequential 4-State Engine
+        this.flowState = 1;
+        this.blackoutElapsedSecs = 134; // default "02:14" for instant review
+        this.currentSpeed = 42;
+        this.flowTransitionTimer = null;
+        this.candidateRoadPoly = null;
+        this.connectorPoly = null;
+        this.connectorDot = null;
+        this.lastReportedMode = 'GNSS';
 
         this.init();
     }
@@ -171,6 +196,29 @@ class NavikDashboard {
         });
 
         this.vehicleMarker = L.marker([52.5618, -1.4552], { icon: vehicleIcon }).addTo(this.map);
+
+        // Candidate road and snap connector for Flow State 3
+        this.candidateRoadPoly = L.polyline([], {
+            color: '#64748b',
+            weight: 3,
+            dashArray: '3, 5',
+            opacity: 0.85
+        }).addTo(this.map);
+
+        this.connectorPoly = L.polyline([], {
+            color: '#f59e0b',
+            weight: 2,
+            dashArray: '3, 3',
+            opacity: 0.95
+        }).addTo(this.map);
+
+        this.connectorDot = L.circleMarker([0, 0], {
+            radius: 4,
+            color: '#f59e0b',
+            fillColor: '#ffffff',
+            fillOpacity: 1,
+            weight: 2
+        });
     }
 
     async loadTelemetry() {
@@ -240,6 +288,13 @@ class NavikDashboard {
             this.dom.toggleOutageBtn.innerText = this.manualOutage ? 'Restore GNSS' : 'Inject Outage';
             this.dom.toggleOutageBtn.style.background = this.manualOutage ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.15)';
             this.dom.toggleOutageBtn.style.color = this.manualOutage ? '#10b981' : '#ef4444';
+
+            if (this.manualOutage) {
+                this.blackoutElapsedSecs = 0;
+                this.setFlowState(2, true);
+            } else {
+                this.setFlowState(4, true);
+            }
         });
 
         // Phone Live Sensor Mode Toggle
@@ -345,6 +400,17 @@ class NavikDashboard {
                 } else {
                     this.flyToBenchmark();
                 }
+            });
+        }
+
+        // GNSS Blackout Flow Stepper buttons (1, 2, 3, 4)
+        if (this.dom.flowStepBtns) {
+            this.dom.flowStepBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const stepNum = parseInt(btn.dataset.step, 10);
+                    this.setFlowState(stepNum, false);
+                });
             });
         }
     }
@@ -747,7 +813,18 @@ class NavikDashboard {
             this.map.panTo(pos, { animate: true, duration: 0.5 });
         }
 
-        // 4. Update Gauges
+        // 4. Update Gauges & GNSS Flow Hero Values
+        this.currentSpeed = frame.speed_kmh;
+        if (this.flowState === 1 && this.dom.flowCardHero) {
+            this.dom.flowCardHero.innerHTML = `${Math.round(frame.speed_kmh)} <span class="hero-unit">km/h</span>`;
+        } else if (this.flowState === 3) {
+            this.blackoutElapsedSecs += 0.1 * this.playbackSpeed;
+            const timerEl = document.getElementById('flowBlackoutTimer');
+            if (timerEl) {
+                timerEl.innerText = this.formatBlackoutTime(this.blackoutElapsedSecs);
+            }
+        }
+
         this.updateSpeedometer(frame.speed_kmh);
         this.updateZupt(frame.speed_mps);
         this.updateCompass(headingDeg);
@@ -819,11 +896,7 @@ class NavikDashboard {
             this.dom.modeDot.style.boxShadow = '0 0 10px var(--neon-crimson)';
             this.dom.gnssStatusText.innerText = 'BLACKOUT (0 SV)';
             this.dom.gnssBars.forEach(b => b.classList.remove('active'));
-            this.dom.mapStatusPill.innerText = 'FALLBACK (>100m)';
-            if (this.dom.blackoutBanner && !this.dom.blackoutBanner.classList.contains('user-dismissed')) {
-                this.dom.blackoutBanner.classList.remove('hidden');
-            }
-
+            this.dom.mapStatusPill.innerText = 'DR FALLBACK';
             if (this.dom.storyBadge && this.dom.storyModeLabel && this.dom.storyDesc) {
                 this.dom.storyBadge.innerText = '🚨 DR FALLBACK';
                 this.dom.storyBadge.classList.add('outage');
@@ -831,6 +904,224 @@ class NavikDashboard {
                 this.dom.storyDesc.innerHTML = 'Prolonged GPS outage (>100m). Kalman filter covariance growing; maintaining vehicle state estimates.';
             }
         }
+    }
+
+    setFlowState(stateNum, autoTriggered = false) {
+        this.flowState = stateNum;
+
+        // Update Stepper buttons active state
+        if (this.dom.flowStepBtns) {
+            this.dom.flowStepBtns.forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.step, 10) === stateNum);
+            });
+        }
+
+        // Cancel auto-transition timers if user clicked manually
+        if (!autoTriggered && this.flowTransitionTimer) {
+            clearTimeout(this.flowTransitionTimer);
+            this.flowTransitionTimer = null;
+        }
+
+        const pill = this.dom.flowStatusPill;
+        const banner = this.dom.flowSlideBanner;
+        const confBadge = this.dom.flowConfidenceBadge;
+        const bottomCard = this.dom.flowBottomCard;
+        const cardLabel = this.dom.flowCardLabel;
+        const cardHero = this.dom.flowCardHero;
+
+        this.updateMarkerVisual(stateNum);
+
+        if (stateNum === 1) {
+            // 1. GNSS active
+            if (pill) {
+                pill.className = 'flow-status-pill state-1';
+                this.dom.flowPillIcon.innerText = '🛰️';
+                this.dom.flowPillText.innerText = 'GNSS active';
+            }
+            if (banner) banner.classList.add('hidden');
+            if (confBadge) confBadge.classList.add('hidden');
+
+            if (bottomCard) {
+                bottomCard.className = 'flow-bottom-card state-1';
+                if (cardLabel) cardLabel.innerText = 'SPEED';
+                if (cardHero) cardHero.innerHTML = `${Math.round(this.currentSpeed || 42)} <span class="hero-unit">km/h</span>`;
+            }
+
+            if (this.fusedPolyline) {
+                this.fusedPolyline.setStyle({ color: '#00f0ff', dashArray: null, weight: 4 });
+            }
+            if (this.candidateRoadPoly) this.candidateRoadPoly.setLatLngs([]);
+            if (this.connectorPoly) this.connectorPoly.setLatLngs([]);
+            if (this.connectorDot && this.map && this.map.hasLayer(this.connectorDot)) {
+                this.map.removeLayer(this.connectorDot);
+            }
+
+            this.updateModeUI('GNSS');
+        } else if (stateNum === 2) {
+            // 2. Signal lost
+            if (pill) {
+                pill.className = 'flow-status-pill state-2';
+                this.dom.flowPillIcon.innerText = '⚠️';
+                this.dom.flowPillText.innerText = 'Signal lost';
+            }
+            if (banner) {
+                banner.classList.remove('hidden');
+                setTimeout(() => {
+                    if (banner) banner.classList.add('hidden');
+                }, 4000);
+            }
+            if (confBadge) confBadge.classList.add('hidden');
+
+            if (bottomCard) {
+                bottomCard.className = 'flow-bottom-card state-2';
+                if (cardLabel) cardLabel.innerText = 'SWITCHING TO';
+                if (cardHero) cardHero.innerHTML = `<span style="color:#f59e0b">Dead reckoning</span>`;
+            }
+
+            if (this.fusedPolyline) {
+                this.fusedPolyline.setStyle({ color: '#f59e0b', dashArray: '8, 8', weight: 4 });
+            }
+            if (this.candidateRoadPoly) this.candidateRoadPoly.setLatLngs([]);
+            if (this.connectorPoly) this.connectorPoly.setLatLngs([]);
+            if (this.connectorDot && this.map && this.map.hasLayer(this.connectorDot)) {
+                this.map.removeLayer(this.connectorDot);
+            }
+
+            this.updateModeUI('DEAD_RECKONING');
+
+            if (autoTriggered) {
+                this.flowTransitionTimer = setTimeout(() => {
+                    this.setFlowState(3, true);
+                }, 1800);
+            }
+        } else if (stateNum === 3) {
+            // 3. DR + map
+            if (pill) {
+                pill.className = 'flow-status-pill state-3';
+                this.dom.flowPillIcon.innerText = '📍';
+                this.dom.flowPillText.innerText = 'DR + map';
+            }
+            if (banner) banner.classList.add('hidden');
+            if (confBadge) {
+                confBadge.classList.remove('hidden');
+                if (this.dom.flowConfNum) this.dom.flowConfNum.innerText = '72%';
+            }
+
+            if (bottomCard) {
+                bottomCard.className = 'flow-bottom-card state-3';
+                if (cardLabel) cardLabel.innerText = 'BLACKOUT TIME';
+                if (cardHero) cardHero.innerHTML = `<span style="color:#f59e0b" id="flowBlackoutTimer">${this.formatBlackoutTime(this.blackoutElapsedSecs)}</span>`;
+            }
+
+            if (this.fusedPolyline) {
+                this.fusedPolyline.setStyle({ color: '#f59e0b', dashArray: '8, 8', weight: 4 });
+            }
+
+            // Draw candidate road segment and snap connector dot
+            if (this.vehicleMarker) {
+                const curPos = this.vehicleMarker.getLatLng();
+                const offsetLat = 0.00025;
+                const offsetLon = 0.00035;
+                const roadStart = [curPos.lat - offsetLat, curPos.lng + offsetLon - 0.0004];
+                const roadSnap = [curPos.lat + 0.00008, curPos.lng + offsetLon];
+                const roadEnd = [curPos.lat + offsetLat + 0.0002, curPos.lng + offsetLon + 0.0004];
+
+                if (this.candidateRoadPoly) {
+                    this.candidateRoadPoly.setLatLngs([roadStart, roadSnap, roadEnd]);
+                }
+                if (this.connectorPoly) {
+                    this.connectorPoly.setLatLngs([[curPos.lat, curPos.lng], roadSnap]);
+                }
+                if (this.connectorDot && this.map) {
+                    this.connectorDot.setLatLng(roadSnap).addTo(this.map);
+                }
+            }
+
+            this.updateModeUI('MAP_CONTEXT');
+        } else if (stateNum === 4) {
+            // 4. GNSS restored
+            if (pill) {
+                pill.className = 'flow-status-pill state-4';
+                this.dom.flowPillIcon.innerText = '✓';
+                this.dom.flowPillText.innerText = 'Restored';
+            }
+            if (banner) banner.classList.add('hidden');
+            if (confBadge) confBadge.classList.add('hidden');
+
+            if (bottomCard) {
+                bottomCard.className = 'flow-bottom-card state-4';
+                if (cardLabel) cardLabel.innerText = 'POSITION';
+                if (cardHero) cardHero.innerHTML = `<span style="color:#10b981">Corrected</span>`;
+            }
+
+            if (this.fusedPolyline) {
+                this.fusedPolyline.setStyle({ color: '#10b981', dashArray: null, weight: 4 });
+            }
+            if (this.candidateRoadPoly) this.candidateRoadPoly.setLatLngs([]);
+            if (this.connectorPoly) this.connectorPoly.setLatLngs([]);
+            if (this.connectorDot && this.map && this.map.hasLayer(this.connectorDot)) {
+                this.map.removeLayer(this.connectorDot);
+            }
+
+            this.updateModeUI('GNSS');
+
+            if (autoTriggered) {
+                this.flowTransitionTimer = setTimeout(() => {
+                    this.setFlowState(1, true);
+                }, 2800);
+            }
+        }
+    }
+
+    updateMarkerVisual(stateNum) {
+        if (!this.vehicleMarker) return;
+        let html = '';
+        if (stateNum === 1) {
+            html = `
+                <div class="pos-marker-container state-1">
+                    <div style="position:absolute; width:26px; height:26px; border-radius:50%; background:rgba(0,240,255,0.25);"></div>
+                    <div class="pos-marker-dot"></div>
+                    <div id="vehicleArrow" style="width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-bottom:16px solid #00f0ff; position:absolute; top:-12px; filter:drop-shadow(0 0 4px #00f0ff); transform-origin:50% 20px;"></div>
+                </div>
+            `;
+        } else if (stateNum === 2) {
+            html = `
+                <div class="pos-marker-container state-2">
+                    <div class="pulse-estimating-ring"></div>
+                    <div class="pos-marker-dot" style="background:#f59e0b; border-color:#fff; box-shadow:0 0 12px #f59e0b;"></div>
+                    <div id="vehicleArrow" style="width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-bottom:16px solid #f59e0b; position:absolute; top:-12px; filter:drop-shadow(0 0 4px #f59e0b); transform-origin:50% 20px;"></div>
+                </div>
+            `;
+        } else if (stateNum === 3) {
+            html = `
+                <div class="pos-marker-container state-3">
+                    <div class="pos-marker-dot" style="background:#f59e0b; border-color:#fff; box-shadow:0 0 14px #f59e0b;"></div>
+                    <div id="vehicleArrow" style="width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-bottom:16px solid #f59e0b; position:absolute; top:-12px; filter:drop-shadow(0 0 4px #f59e0b); transform-origin:50% 20px;"></div>
+                </div>
+            `;
+        } else if (stateNum === 4) {
+            html = `
+                <div class="pos-marker-container state-4">
+                    <div class="pulse-resync-ring"></div>
+                    <div class="pos-marker-dot" style="background:#10b981; border-color:#fff; box-shadow:0 0 14px #10b981;"></div>
+                    <div id="vehicleArrow" style="width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-bottom:16px solid #10b981; position:absolute; top:-12px; filter:drop-shadow(0 0 4px #10b981); transform-origin:50% 20px;"></div>
+                </div>
+            `;
+        }
+
+        const newIcon = L.divIcon({
+            className: 'vehicle-marker-icon',
+            html: html,
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
+        });
+        this.vehicleMarker.setIcon(newIcon);
+    }
+
+    formatBlackoutTime(totalSecs) {
+        const mins = Math.floor(totalSecs / 60);
+        const secs = Math.floor(totalSecs % 60);
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
     getCardinal(deg) {

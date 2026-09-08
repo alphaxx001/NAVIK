@@ -147,6 +147,49 @@
                     <button class="btn-close-banner" id="btnCloseBanner" title="Dismiss Alert">✕</button>
                 </div>
 
+                <!-- GNSS Blackout Flow Component Set (SIH 26168 Sequential 4-State UI) -->
+                <div class="gnss-flow-overlay" id="gnssFlowOverlay">
+                    <!-- Reviewer 5-Second 4-State Stepper Toolbar -->
+                    <div class="flow-state-stepper" id="flowStateStepper" title="Click to step through the 4 GNSS Outage States">
+                        <span class="stepper-tag">FLOW:</span>
+                        <button class="btn-flow-step active" data-step="1" id="flowStepBtn1">1. GNSS active</button>
+                        <button class="btn-flow-step" data-step="2" id="flowStepBtn2">2. Signal lost</button>
+                        <button class="btn-flow-step" data-step="3" id="flowStepBtn3">3. DR + map</button>
+                        <button class="btn-flow-step" data-step="4" id="flowStepBtn4">4. Restored</button>
+                    </div>
+
+                    <!-- Top Status Pill (floating, rounded, semi-transparent dark surface) -->
+                    <div class="flow-status-pill state-1" id="flowStatusPill">
+                        <span class="pill-icon" id="flowPillIcon">🛰️</span>
+                        <span class="pill-text" id="flowPillText">GNSS active</span>
+                    </div>
+
+                    <!-- Slide-in Amber Banner (State 2) -->
+                    <div class="flow-slide-banner hidden" id="flowSlideBanner">
+                        <span class="banner-accent-bar"></span>
+                        <span class="banner-icon">⚠️</span>
+                        <span class="banner-msg">GNSS SIGNAL LOST &mdash; ESTIMATING POSITION</span>
+                    </div>
+
+                    <!-- Map Corner Confidence Readout (State 3: 72% match real data point) -->
+                    <div class="flow-confidence-badge hidden" id="flowConfidenceBadge">
+                        <span class="conf-num" id="flowConfNum">72%</span>
+                        <span class="conf-sub">match</span>
+                    </div>
+
+                    <!-- Floating Bottom Card (rounded top corners, solid surface, subtle elevation) -->
+                    <div class="flow-bottom-card state-1" id="flowBottomCard">
+                        <div class="card-drag-handle"></div>
+                        <div class="card-metric-block">
+                            <div class="card-metric-label" id="flowCardLabel">SPEED</div>
+                            <div class="card-metric-hero" id="flowCardHero">
+                                <span class="hero-num" id="flowHeroNum">42</span>
+                                <span class="hero-unit" id="flowHeroUnit">km/h</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Floating Live Telemetry HUD Widget (Always accessible on Map, especially in Fullscreen) -->
                 <div class="map-hud-overlay" id="mapHudOverlay">
                     <div class="hud-pill hud-speed">
@@ -332,6 +375,6 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="app.js?v=2.2"></script>
+    <script src="app.js?v=3.0"></script>
 </body>
 </html>
