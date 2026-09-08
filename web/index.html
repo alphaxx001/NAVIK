@@ -142,7 +142,32 @@
                     <span class="banner-icon">⚠️</span>
                     <div class="banner-text">
                         <strong>GNSS OUTAGE IN PROGRESS</strong>
-                        <span>Error-State Kalman Filter & SpeedNet Dead-Reckoning Active</span>
+                        <span>AI Dead-Reckoning Active (SpeedNet + ESKF)</span>
+                    </div>
+                    <button class="btn-close-banner" id="btnCloseBanner" title="Dismiss Alert">✕</button>
+                </div>
+
+                <!-- Floating Live Telemetry HUD Widget (Always accessible on Map, especially in Fullscreen) -->
+                <div class="map-hud-overlay" id="mapHudOverlay">
+                    <div class="hud-pill hud-speed">
+                        <span class="hud-label">SPEED</span>
+                        <div class="hud-val-row">
+                            <span class="hud-val" id="hudSpeedVal">0.0</span>
+                            <span class="hud-unit">km/h</span>
+                        </div>
+                    </div>
+                    <div class="hud-pill hud-heading">
+                        <span class="hud-label">HEADING</span>
+                        <div class="hud-val-row">
+                            <span class="hud-val" id="hudHeadingVal">017°</span>
+                            <span class="hud-unit" id="hudHeadingDir">NNE</span>
+                        </div>
+                    </div>
+                    <div class="hud-pill hud-zupt">
+                        <span class="hud-label">MOTION</span>
+                        <div class="hud-val-row">
+                            <span class="hud-val" id="hudZuptVal">MOVING</span>
+                        </div>
                     </div>
                 </div>
 
@@ -152,6 +177,7 @@
                         <span id="playIcon">▶</span>
                     </button>
                     <button class="btn btn-icon" id="resetBtn" title="Reset Timeline">↺</button>
+                    <button class="btn btn-icon btn-hud-toggle" id="btnToggleHud" title="Toggle Floating Telemetry HUD">📊</button>
                     
                     <div class="timeline-container">
                         <input type="range" class="timeline-slider" id="timelineSlider" min="0" max="100" value="0" step="1">

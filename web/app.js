@@ -269,6 +269,7 @@ class NavikDashboard {
                 const mapSection = document.querySelector('.map-section');
                 mapSection.classList.toggle('fullscreen-map');
                 const isFull = mapSection.classList.contains('fullscreen-map');
+                document.body.classList.toggle('in-fullscreen-map', isFull);
                 btnExpand.innerHTML = isFull ? '✕ Exit' : '⛶ Fullscreen';
                 btnExpand.classList.toggle('active', isFull);
                 [50, 150, 300, 600].forEach(ms => {
@@ -276,6 +277,30 @@ class NavikDashboard {
                         if (this.map) this.map.invalidateSize();
                     }, ms);
                 });
+            });
+        }
+
+        // Floating HUD Toggle Button
+        const btnToggleHud = document.getElementById('btnToggleHud');
+        if (btnToggleHud) {
+            btnToggleHud.addEventListener('click', () => {
+                const hud = document.getElementById('mapHudOverlay');
+                if (hud) {
+                    hud.classList.toggle('hidden');
+                    btnToggleHud.classList.toggle('active', !hud.classList.contains('hidden'));
+                }
+            });
+        }
+
+        // Close/Dismiss Blackout Banner Button
+        const btnCloseBanner = document.getElementById('btnCloseBanner');
+        if (btnCloseBanner) {
+            btnCloseBanner.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this.dom.blackoutBanner) {
+                    this.dom.blackoutBanner.classList.add('user-dismissed');
+                    this.dom.blackoutBanner.classList.add('hidden');
+                }
             });
         }
 
@@ -640,7 +665,10 @@ class NavikDashboard {
             this.dom.gnssStatusText.innerText = 'LOCKED (12 SV)';
             this.dom.gnssBars.forEach(b => b.classList.add('active'));
             this.dom.mapStatusPill.innerText = 'PASS-THROUGH';
-            this.dom.blackoutBanner.classList.add('hidden');
+            if (this.dom.blackoutBanner) {
+                this.dom.blackoutBanner.classList.remove('user-dismissed');
+                this.dom.blackoutBanner.classList.add('hidden');
+            }
 
             if (this.dom.storyBadge && this.dom.storyModeLabel && this.dom.storyDesc) {
                 this.dom.storyBadge.innerText = '🟢 GPS LOCKED';
@@ -654,7 +682,9 @@ class NavikDashboard {
             this.dom.gnssStatusText.innerText = 'BLACKOUT (0 SV)';
             this.dom.gnssBars.forEach(b => b.classList.remove('active'));
             this.dom.mapStatusPill.innerText = 'HMM SNAPPED';
-            this.dom.blackoutBanner.classList.remove('hidden');
+            if (this.dom.blackoutBanner && !this.dom.blackoutBanner.classList.contains('user-dismissed')) {
+                this.dom.blackoutBanner.classList.remove('hidden');
+            }
 
             if (this.dom.storyBadge && this.dom.storyModeLabel && this.dom.storyDesc) {
                 this.dom.storyBadge.innerText = '⚠️ TUNNEL MODE';
@@ -668,7 +698,9 @@ class NavikDashboard {
             this.dom.gnssStatusText.innerText = 'BLACKOUT (0 SV)';
             this.dom.gnssBars.forEach(b => b.classList.remove('active'));
             this.dom.mapStatusPill.innerText = 'SEARCHING';
-            this.dom.blackoutBanner.classList.remove('hidden');
+            if (this.dom.blackoutBanner && !this.dom.blackoutBanner.classList.contains('user-dismissed')) {
+                this.dom.blackoutBanner.classList.remove('hidden');
+            }
 
             if (this.dom.storyBadge && this.dom.storyModeLabel && this.dom.storyDesc) {
                 this.dom.storyBadge.innerText = '⚠️ INERTIAL DR';
@@ -683,7 +715,9 @@ class NavikDashboard {
             this.dom.gnssStatusText.innerText = 'BLACKOUT (0 SV)';
             this.dom.gnssBars.forEach(b => b.classList.remove('active'));
             this.dom.mapStatusPill.innerText = 'FALLBACK (>100m)';
-            this.dom.blackoutBanner.classList.remove('hidden');
+            if (this.dom.blackoutBanner && !this.dom.blackoutBanner.classList.contains('user-dismissed')) {
+                this.dom.blackoutBanner.classList.remove('hidden');
+            }
 
             if (this.dom.storyBadge && this.dom.storyModeLabel && this.dom.storyDesc) {
                 this.dom.storyBadge.innerText = '🚨 DR FALLBACK';
@@ -694,8 +728,17 @@ class NavikDashboard {
         }
     }
 
+    getCardinal(deg) {
+        const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+        const idx = Math.round(((deg % 360) / 22.5)) % 16;
+        return directions[idx];
+    }
+
     updateSpeedometer(kmh) {
         this.dom.speedValue.innerText = kmh.toFixed(1);
+        const hudSpeed = document.getElementById('hudSpeedVal');
+        if (hudSpeed) hudSpeed.innerText = kmh.toFixed(1);
+
         // Gauge circle circumference = 2 * PI * 50 ≈ 314
         const maxKmh = 100.0;
         const fraction = Math.min(1.0, kmh / maxKmh);
@@ -712,11 +755,23 @@ class NavikDashboard {
         this.dom.zuptProb.innerText = `${prob.toFixed(2)} P`;
         this.dom.zuptState.innerText = isStationary ? 'STATIONARY (ZUPT)' : 'MOVING';
         this.dom.zuptState.style.color = isStationary ? 'var(--neon-crimson)' : 'var(--neon-emerald)';
+
+        const hudZupt = document.getElementById('hudZuptVal');
+        if (hudZupt) {
+            hudZupt.innerText = isStationary ? 'STOPPED' : 'MOVING';
+            hudZupt.style.color = isStationary ? 'var(--neon-crimson)' : 'var(--neon-emerald)';
+        }
     }
 
     updateCompass(deg) {
-        this.dom.headingReadout.innerText = `${Math.round(deg).toString().padStart(3, '0')}°`;
+        const degStr = `${Math.round(deg).toString().padStart(3, '0')}°`;
+        this.dom.headingReadout.innerText = degStr;
         this.dom.compassDial.style.transform = `rotate(${-deg}deg)`;
+
+        const hudHeading = document.getElementById('hudHeadingVal');
+        if (hudHeading) hudHeading.innerText = degStr;
+        const hudDir = document.getElementById('hudHeadingDir');
+        if (hudDir) hudDir.innerText = this.getCardinal(deg);
     }
 
     updateWaveforms(imu) {
