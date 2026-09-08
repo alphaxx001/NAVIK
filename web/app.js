@@ -327,6 +327,26 @@ class NavikDashboard {
                 this.locateUser();
             });
         }
+
+        // Benchmark Route Return Button
+        const btnBenchmark = document.getElementById('btnBenchmarkRoute');
+        if (btnBenchmark) {
+            btnBenchmark.addEventListener('click', () => {
+                this.flyToBenchmark();
+            });
+        }
+
+        // Floating Location Tag Click
+        const locTag = document.getElementById('mapLocationTag');
+        if (locTag) {
+            locTag.addEventListener('click', () => {
+                if (this.isLivePhoneMode) {
+                    this.locateUser();
+                } else {
+                    this.flyToBenchmark();
+                }
+            });
+        }
     }
 
     toggleLivePhoneMode() {
@@ -474,17 +494,50 @@ class NavikDashboard {
     }
 
     stopLivePhoneMode() {
+        this.flyToBenchmark();
+    }
+
+    flyToBenchmark() {
         this.isLivePhoneMode = false;
-        this.dom.phoneModeBtn.classList.remove('active');
-        this.dom.phoneModeBtn.innerText = '📱 Live Sensors';
+        if (this.dom.phoneModeBtn) {
+            this.dom.phoneModeBtn.classList.remove('active');
+            this.dom.phoneModeBtn.innerText = '📱 Live Sensors';
+        }
         if (this.dom.sensorLiveReadout) this.dom.sensorLiveReadout.innerText = 'STANDBY';
+
+        this.stopSimulatedPhoneSensors();
+
+        if (this.motionHandler) window.removeEventListener('devicemotion', this.motionHandler);
+        if (this.orientationHandler) window.removeEventListener('deviceorientation', this.orientationHandler);
+        if (this.geoWatchId && navigator.geolocation) {
+            navigator.geolocation.clearWatch(this.geoWatchId);
+            this.geoWatchId = null;
+        }
+
+        if (this.userAccCircle) {
+            this.map.removeLayer(this.userAccCircle);
+            this.userAccCircle = null;
+        }
+
+        if (this.dom.btnLocateMe) {
+            this.dom.btnLocateMe.classList.remove('active');
+            this.dom.btnLocateMe.innerText = '📍 My Location';
+        }
+
         if (this.dom.locationTagText) {
             this.dom.locationTagText.innerText = '🚗 Demo Replay: Coventry Benchmark (UK)';
         }
 
-        if (this.motionHandler) window.removeEventListener('devicemotion', this.motionHandler);
-        if (this.orientationHandler) window.removeEventListener('deviceorientation', this.orientationHandler);
-        if (this.geoWatchId && navigator.geolocation) navigator.geolocation.clearWatch(this.geoWatchId);
+        // Smoothly fly camera back to UK benchmark route, reset vehicle marker, and resume replay
+        if (this.data && this.data.frames && this.data.frames.length > 0) {
+            const frame = this.data.frames[this.currentIndex || 0];
+            const targetPos = frame.mode === 'GNSS' ? frame.gt.slice(0, 2) : frame.fused;
+            this.vehicleMarker.setLatLng(targetPos);
+            this.map.flyTo(targetPos, 16, { duration: 1.5 });
+            this.renderFrame(this.currentIndex || 0);
+            this.isPlaying = true;
+            if (this.dom.playIcon) this.dom.playIcon.innerText = '❚❚';
+        }
     }
 
     locateUser() {
